@@ -1,12 +1,12 @@
 'use client'
-import { Home, PhoneCall, Calendar, Tv2, Users } from 'lucide-react'
+import { Home, PhoneCall, Calendar, Tv2, Users, ChevronLeft } from 'lucide-react'
 
 const menuItems = [
-  { label: 'Home', icon: <Home size={18} /> },
-  { label: 'Chamado', icon: <PhoneCall size={18} /> },
-  { label: 'Eventos', icon: <Calendar size={18} /> },
-  { label: 'Série do mês', icon: <Tv2 size={18} /> },
-  { label: 'Grupos Familiares', icon: <Users size={18} /> },
+  { label: 'Home', icon: <Home size={18} className="text-[#ff6b00]" /> },
+  { label: 'Chamado', icon: <PhoneCall size={18} className="text-[#ff6b00]" /> },
+  { label: 'Eventos', icon: <Calendar size={18} className="text-[#ff6b00]" /> },
+  { label: 'Série do mês', icon: <Tv2 size={18} className="text-[#ff6b00]" /> },
+  { label: 'Grupos Familiares', icon: <Users size={18} className="text-[#ff6b00]" /> },
 ]
 
 export default function Sidebar({ Open, setOpen }) {
@@ -35,10 +35,10 @@ export default function Sidebar({ Open, setOpen }) {
             <span className='text-base font-semibold tracking-wide'>Eu Sou</span>
           </div>
           <button
-            onClick={() => setOpen(false)}
-            className='w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center text-white/70 hover:text-white text-sm'
-          >
-            ◀
+              onClick={() => setOpen(false)}
+              className='w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center'
+            >
+              <ChevronLeft size={18} className="text-[#ff6b00]" />
           </button>
         </div>
 

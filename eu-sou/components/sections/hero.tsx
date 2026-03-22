@@ -1,37 +1,32 @@
-import Image from "next/image";
+"use client";
 
-export default function Hero(){
-    return (
-        <section className="relative h-screen">
+export default function Hero() {
+  return (
+    <section className="relative w-full h-[70vh] sm:h-[85vh] md:h-[90vh] flex items-center justify-center overflow-hidden">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/img/img-fundo.jpg')" }}
+      />
 
-            {/* camada 1 — imagem de fundo */}
-            <Image 
-                src="/img/img-fundo.jpg"  
-                alt="Fundo Hero"  
-                fill                        
-                className="object-cover z-0" 
-                loading="eager"
-            />
+      {/* Película escura */}
+      <div className="absolute inset-0 bg-black/60" />
 
-            {/* camada 2 — vinheta */}
-            <div className="absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(0,0,0,0.95)_100%)]" />
+      {/* Conteúdo centralizado */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6">
 
-            {/* camada 3 — logo + texto juntos */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-20 gap-2">
-                <div className="relative w-[320px] h-[240px] sm:w-[480px] sm:h-[360px] md:w-[600px] md:h-[450px] lg:w-[750px] lg:h-[560px] xl:w-[900px] xl:h-[675px]">
-                    <Image 
-                        src="/img/logo.png"  
-                        alt="Logo Eu Sou"  
-                        fill
-                        className="object-contain" 
-                        loading="eager"
-                    />
-                </div>
-                <h3 className="text-white text-sm sm:text-base md:text-lg lg:text-xl tracking-widest text-center px-4">
-                    Resgatando a identidade em Cristo e formando Discipulos
-                </h3>
-            </div>
+        {/* Wrapper da logo + botão ancorado */}
+        <div className="relative w-[85vw] sm:w-[70vw] md:w-[60vw] lg:w-[55vw] xl:w-[50vw] 2xl:w-[42vw] max-w-[1100px]">
 
-        </section>
-    )
+          {/* Logo */}
+          <img
+            src="/img/logo-eu-sou.png"
+            alt="Eu Sou"
+            className="w-full h-auto object-contain"
+          />
+
+        </div>
+      </div>
+    </section>
+  );
 }
