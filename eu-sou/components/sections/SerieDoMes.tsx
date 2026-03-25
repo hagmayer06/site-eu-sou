@@ -9,33 +9,17 @@ type SerieDoMes = {
   livro: string
   descricao: string
   imagem_url: string
-  semanas?: string[]
-  tema_mes?: string
-  mes?: string
-  ano?: string
+  mes: string        // ex: "MARÇO"
+  semana_1: string
+  semana_2: string
+  semana_3: string
+  semana_4: string
 }
 
-const serieMock: SerieDoMes = {
-  titulo: "Identidade em Cristo",
-  livro: "Efésios",
-  descricao:
-    "Durante todo o mês de março, vamos mergulhar no tema da nossa identidade em Cristo. Quem somos? O que Deus diz sobre nós? Descubra o poder de viver na plenitude do que Ele planejou para você.",
-  imagem_url: "/img/img-membro.jpeg",
-  semanas: [
-    "Semana 1: Filhos de Deus",
-    "Semana 2: Nova Criatura",
-    "Semana 3: Embaixadores",
-    "Semana 4: Mais que Vencedores",
-  ],
-  tema_mes: "SÉRIE DO MÊS",
-  mes: "MARÇO",
-  ano: "MARÇO 2026",
-}
-
-export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }) {
-  const semanas = serie.semanas ?? serieMock.semanas!
-  const mes = serie.mes ?? "MARÇO"
+export default function SerieDoMes({ serie }: { serie: SerieDoMes }) {
   const ORANGE = "#ff6b00"
+
+  const semanas = [serie.semana_1, serie.semana_2, serie.semana_3, serie.semana_4].filter(Boolean)
 
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
@@ -45,7 +29,7 @@ export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true)
-          observer.disconnect() // anima só uma vez
+          observer.disconnect()
         }
       },
       { threshold: 0.15 }
@@ -54,7 +38,6 @@ export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }
     return () => observer.disconnect()
   }, [])
 
-  // Utilitário de delay escalonado para cada elemento
   const fade = (delay: number, extraY = 24) => ({
     opacity: visible ? 1 : 0,
     transform: visible ? "translateY(0)" : `translateY(${extraY}px)`,
@@ -72,13 +55,13 @@ export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }
           className="text-[10px] font-semibold tracking-[0.35em] uppercase"
           style={{ color: ORANGE, ...fade(0) }}
         >
-          {serie.tema_mes ?? "SÉRIE DO MÊS"}
+          SÉRIE DO MÊS
         </span>
         <h2
           className="text-3xl md:text-4xl font-black uppercase text-white tracking-tight"
           style={fade(100)}
         >
-          TEMA DE <span style={{ color: ORANGE }}>{mes}</span>
+          TEMA DE <span style={{ color: ORANGE }}>{serie.mes.toUpperCase()}</span>
         </h2>
       </div>
 
@@ -88,12 +71,13 @@ export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }
         style={{
           minHeight: "340px",
           border: `1px solid ${ORANGE}`,
-          
+          boxShadow: "0 0 40px 6px rgba(255,107,0,0.25), 0 20px 60px rgba(0,0,0,0.6)",
+          ...fade(200, 40),
         }}
       >
         {/* Imagem de fundo */}
         <img
-          src={serie.imagem_url}
+          src={serie.imagem_url || "/placeholder.jpg"}
           alt={serie.titulo}
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
@@ -116,12 +100,12 @@ export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }
 
           <div className="flex flex-col gap-2">
 
-            {/* Data */}
+            {/* Mês + ano */}
             <span
               className="text-[10px] font-bold tracking-[0.25em] uppercase"
               style={{ color: ORANGE, ...fade(350) }}
             >
-              {serie.ano ?? "MARÇO 2026"}
+              {serie.mes.toUpperCase()} 2026
             </span>
 
             {/* Título */}
@@ -140,7 +124,7 @@ export default function SerieDoMes({ serie = serieMock }: { serie?: SerieDoMes }
               {serie.descricao}
             </p>
 
-            {/* Pills */}
+            {/* Pills das semanas */}
             {semanas.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {semanas.map((semana, i) => (

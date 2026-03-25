@@ -1,5 +1,16 @@
-import { NextResponse } from 'next/server'
+// lib/queries.ts
+import { supabase } from "./supabase"
 
-export async function GET() {
-  return NextResponse.json({ message: 'ok' })
+export async function getSerieDoMes() {
+  const { data, error } = await supabase
+    .from("serie_do_mes")
+    .select("*")
+    .single()
+
+  if (error) {
+    console.error("Erro ao buscar série do mês:", error)
+    return null
+  }
+
+  return data
 }

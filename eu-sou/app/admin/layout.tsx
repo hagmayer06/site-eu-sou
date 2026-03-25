@@ -1,5 +1,12 @@
-export default function admin(){
-    return (
-        <div></div>
-    )
+// app/admin/layout.tsx
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <div className="min-h-screen bg-white">
+      {children}
+    </div>
+  )
 }
