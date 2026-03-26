@@ -27,7 +27,7 @@ export default function ChamadoSection() {
     <section
       id="chamado"
       ref={sectionRef}
-      className="relative bg-[#0f0f0f] py-20 md:py-28 2xl:py-44 px-6 overflow-hidden"
+      className="relative bg-black py-20 md:py-28 2xl:py-44 px-6 overflow-hidden"
     >
       {/* ── Background: circular orange rings ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -44,14 +44,6 @@ export default function ChamadoSection() {
             <circle key={`r-${i}`} cx="1050" cy="450" r={r} fill="none" stroke="#ff6b00" strokeWidth="1" />
           ))}
         </svg>
-        <div
-          className="absolute left-[-10%] top-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%)" }}
-        />
-        <div
-          className="absolute right-[-5%] top-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(255,107,0,0.05) 0%, transparent 70%)" }}
-        />
       </div>
 
       {/* ── Content ── */}

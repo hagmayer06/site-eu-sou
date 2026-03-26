@@ -3,6 +3,7 @@ import Hero from "@/components/sections/hero"
 import ChamadoSection from "@/components/sections/Chamadosection"
 import SerieDoMes from "@/components/sections/SerieDoMes"
 import { getSerieDoMes } from "@/lib/queries"
+import Eventos from "@/components/sections/Eventos"
 
 export default async function Home() {
   const serie = await getSerieDoMes()
@@ -12,6 +13,7 @@ export default async function Home() {
       <Hero />
       <ChamadoSection />
       {serie && <SerieDoMes serie={serie} />}
+      <Eventos />
     </main>
   )
 }
