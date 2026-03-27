@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
@@ -9,7 +9,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   const router = useRouter();
+  const pathname = usePathname(); // <--- NOVO: Descobre em qual URL estamos
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,9 +28,18 @@ export default function LoginPage() {
         setError('E-mail ou senha incorretos.');
         setLoading(false);
       } else {
-        console.log("Sucesso! Redirecionando...");
-        await new Promise(resolve => setTimeout(resolve, 500));
-        router.push('/admin/serie');
+        console.log("Sucesso! Autenticado.");
+        // Removi o router.push() forçado daqui!
+        
+        // Se o usuário acessou a rota de login diretamente (ex: /admin/login), 
+        // aí sim a gente empurra ele pra algum painel padrão.
+        if (pathname === '/admin/login' || pathname === '/admin') {
+           await new Promise(resolve => setTimeout(resolve, 500));
+           router.push('/admin/eventos'); // Escolha qual será o painel padrão
+        }
+        
+        // Se ele já estiver em /admin/eventos ou /admin/serie, 
+        // não fazemos NADA. O estado reativo do pai vai trocar a tela sozinho!
       }
     } catch (err) {
       setError('Erro inesperado ao tentar logar.');
@@ -41,7 +52,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-2xl">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-black text-white uppercase tracking-tighter">
-            Área <span className="text-orange-500">Restrita</span>
+            Área <span className="text-[#ff6b00]">Restrita</span>
           </h1>
           <p className="text-zinc-500 text-sm mt-2 font-medium italic">Igreja Eu Sou</p>
         </div>
@@ -54,24 +65,24 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block text-xs font-bold uppercase text-orange-500 mb-2 tracking-widest">E-mail</label>
+            <label className="block text-xs font-bold uppercase text-[#ff6b00] mb-2 tracking-widest">E-mail</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-zinc-700"
+              className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-[#ff6b00] outline-none transition-all placeholder:text-zinc-700"
               placeholder="seu@email.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase text-orange-500 mb-2 tracking-widest">Senha</label>
+            <label className="block text-xs font-bold uppercase text-[#ff6b00] mb-2 tracking-widest">Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-zinc-700"
+              className="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:ring-2 focus:ring-[#ff6b00] outline-none transition-all placeholder:text-zinc-700"
               placeholder="••••••••"
               required
             />
@@ -80,7 +91,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-black font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:bg-zinc-800 disabled:text-zinc-600 shadow-[0_0_20px_rgba(249,115,22,0.1)]"
+            className="w-full py-4 bg-[#ff6b00] hover:bg-[#e65a00] text-white font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:bg-zinc-800 disabled:text-zinc-600 shadow-[0_0_20px_rgba(255,107,0,0.1)] flex justify-center"
           >
             {loading ? 'AUTENTICANDO...' : 'ENTRAR NO PAINEL'}
           </button>
