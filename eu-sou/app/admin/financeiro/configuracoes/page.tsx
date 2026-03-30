@@ -6,6 +6,8 @@ import {
   salvarConfiguracaoAction,
 } from '../actions'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ConfiguracoesFinanceiroPage() {
   const categorias = await getCategorias()
   const config = await getConfiguracaoIgreja()

@@ -13,12 +13,17 @@ Site da Igreja Eu Sou com área de membros protegida, autenticação via Supabas
    - [Migrations](#migrations)
    - [Auth Providers](#auth-providers)
    - [Storage — Bucket `avatares`](#storage--bucket-avatares)
-3. [Desenvolvimento Local](#desenvolvimento-local)
-4. [Estrutura de Rotas](#estrutura-de-rotas)
-5. [Checklist de Deploy](#checklist-de-deploy)
-6. [Estratégia de Rollback](#estratégia-de-rollback)
-7. [Monitoramento de Logs](#monitoramento-de-logs)
-8. [Checklist de QA Manual](#checklist-de-qa-manual)
+3. [Módulo Financeiro](#módulo-financeiro)
+   - [Storage — Bucket `comprovantes`](#storage--bucket-comprovantes-módulo-financeiro)
+   - [Edge Function `avisos-vencimento`](#edge-function-avisos-vencimento)
+   - [Checklist de Deploy — Módulo Financeiro](#checklist-de-deploy--módulo-financeiro)
+   - [QA Manual — Módulo Financeiro](#qa-manual--módulo-financeiro)
+4. [Desenvolvimento Local](#desenvolvimento-local)
+5. [Estrutura de Rotas](#estrutura-de-rotas)
+6. [Checklist de Deploy](#checklist-de-deploy)
+7. [Estratégia de Rollback](#estratégia-de-rollback)
+8. [Monitoramento de Logs](#monitoramento-de-logs)
+9. [Checklist de QA Manual](#checklist-de-qa-manual)
 
 ---
 
@@ -35,11 +40,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 
 # Chave de serviço (NUNCA expor ao cliente — apenas Server Components e Route Handlers)
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
+
+# URL pública do site (usada nos links dos e-mails)
+NEXT_PUBLIC_SITE_URL=https://seu-dominio.com
+
+# Módulo Financeiro — Edge Function avisos-vencimento
+RESEND_API_KEY=re_...              # Resend.com — criar em resend.com/api-keys
+EMAIL_FROM=noreply@seu-dominio.com # Remetente dos avisos de vencimento
 ```
 
 > **Onde encontrar:** Supabase Dashboard → Project Settings → API.
 >
 > Para produção (Vercel), configure as mesmas variáveis em **Project Settings → Environment Variables**.
+>
+> As variáveis `RESEND_API_KEY` e `EMAIL_FROM` também precisam ser configuradas nos **segredos da Edge Function** (ver seção [Edge Function `avisos-vencimento`](#edge-function-avisos-vencimento)).
 
 ---
 
@@ -117,6 +131,144 @@ Bucket **privado** para comprovantes de pagamento Pix enviados por membros. Aces
 **RLS de storage** (já incluída na migration):
 - Membro autenticado: upload apenas na própria pasta (`{userId}/...`)
 - Service role: acesso total (usado pelos Route Handlers)
+
+---
+
+---
+
+## Módulo Financeiro
+
+O módulo financeiro permite ao tesoureiro e pastor gerenciar entradas, saídas, categorias e comprovantes da Igreja. Conferentes têm acesso restrito ao próprio grupo celular.
+
+### Rotas do módulo
+
+| Rota | Acesso | Descrição |
+|---|---|---|
+| `/admin/financeiro` | Pastor / Tesoureiro / Conferente | Dashboard (KPIs + gráficos) |
+| `/admin/financeiro/entradas` | Pastor / Tesoureiro / Conferente | Lançar e listar entradas |
+| `/admin/financeiro/saidas` | Pastor / Tesoureiro / Conferente | Lançar e listar saídas |
+| `/admin/financeiro/comprovantes` | Pastor / Tesoureiro | Confirmar comprovantes pendentes |
+| `/admin/financeiro/relatorios` | Pastor / Tesoureiro | Exportar relatórios CSV |
+| `/admin/financeiro/configuracoes` | Pastor / Tesoureiro | Categorias e dados da igreja |
+
+### Storage — Bucket `comprovantes` (módulo financeiro)
+
+Bucket **privado** para comprovantes de pagamento Pix enviados por membros.
+
+**Criado automaticamente pela migration `20260329160215_criar_financeiro.sql`.** Não é necessária configuração manual se a migration foi aplicada.
+
+**Criar manualmente (se necessário):**
+
+```sql
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'comprovantes', 'comprovantes', false, 10485760,
+  array['image/jpeg','image/png','image/webp','image/gif','application/pdf']
+);
+
+-- Membro sobe comprovante na própria pasta
+create policy "comprovantes_upload_proprio"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'comprovantes' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Service role acessa tudo (Route Handlers)
+create policy "comprovantes_service_role"
+  on storage.objects for all to service_role
+  using (bucket_id = 'comprovantes');
+```
+
+### Edge Function `avisos-vencimento`
+
+Envia e-mail diário ao(s) tesoureiro(s) listando lançamentos pendentes que vencem em 3 dias.
+
+**Cron:** `0 11 * * *` (11h UTC = 08h BRT)
+
+#### Pré-requisitos
+
+1. Conta na [Resend](https://resend.com) com domínio verificado
+2. Variáveis configuradas como segredos da Edge Function
+
+#### Configurar segredos no Supabase
+
+```bash
+# Produção (remoto)
+supabase secrets set RESEND_API_KEY=re_...
+supabase secrets set EMAIL_FROM=noreply@seu-dominio.com
+supabase secrets set NEXT_PUBLIC_SITE_URL=https://seu-dominio.com
+```
+
+Para ambiente local (`.env` na raiz do projeto, não commitado):
+
+```bash
+# supabase/.env  (gitignored)
+RESEND_API_KEY=re_...
+EMAIL_FROM=noreply@seu-dominio.com
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+#### Deploy
+
+```bash
+# Autenticar e linkar o projeto (uma vez)
+supabase login
+supabase link --project-ref <project-ref>
+
+# Fazer deploy com o cron configurado no config.toml
+supabase functions deploy avisos-vencimento
+```
+
+#### Testar localmente
+
+```bash
+# Subir as Edge Functions localmente
+supabase functions serve avisos-vencimento --env-file supabase/.env
+
+# Em outro terminal — disparar manualmente
+curl -i --location --request POST \
+  'http://127.0.0.1:54321/functions/v1/avisos-vencimento' \
+  --header 'Authorization: Bearer <SUPABASE_ANON_KEY>'
+```
+
+Verificar e-mail recebido em `http://localhost:54324` (Inbucket).
+
+### Checklist de Deploy — Módulo Financeiro
+
+Execute junto ao checklist geral antes de cada deploy que inclua o módulo financeiro.
+
+- [ ] Migration `20260329160215_criar_financeiro.sql` aplicada (`supabase db push`)
+- [ ] Bucket `comprovantes` criado com RLS configurada
+- [ ] Variáveis de ambiente configuradas na Vercel:
+  - [ ] `NEXT_PUBLIC_SITE_URL`
+  - [ ] `RESEND_API_KEY`
+  - [ ] `EMAIL_FROM`
+- [ ] Segredos da Edge Function configurados (`supabase secrets set ...`)
+- [ ] Edge Function implantada: `supabase functions deploy avisos-vencimento`
+- [ ] Cron ativo: verificar em Supabase Dashboard → Edge Functions → `avisos-vencimento` → Schedule
+- [ ] Pelo menos um usuário com papel `tesoureiro` cadastrado (recebe os avisos)
+
+### QA Manual — Módulo Financeiro
+
+#### Fluxo Tesoureiro
+
+- [ ] Acessar `/admin/financeiro` → dashboard carrega com KPIs e gráficos
+- [ ] KPI "Saldo Acumulado" reflete entradas - saídas de todos os lançamentos
+- [ ] Gráfico de barras exibe 6 meses anteriores (meses sem lançamento aparecem com zero)
+- [ ] Gráfico de pizza exibe categorias de entrada corretamente
+- [ ] Criar entrada em `/admin/financeiro/entradas` → aparece no dashboard
+- [ ] Criar saída com data de vencimento em `/admin/financeiro/saidas`
+- [ ] Saída com vencimento ≤7 dias aparece na lista "Vencimentos próximos" com badge amarelo
+- [ ] Saída vencida aparece com badge vermelho
+- [ ] Adicionar/editar/desativar categoria em `/admin/financeiro/configuracoes`
+- [ ] Badge de comprovantes pendentes aparece no dashboard quando há comprovantes
+- [ ] Badge leva corretamente a `/admin/financeiro/comprovantes`
+
+#### Fluxo Conferente
+
+- [ ] Login como conferente → acessa `/admin/financeiro`
+- [ ] Dashboard exibe apenas dados do grupo do conferente (badge "Apenas seu grupo")
+- [ ] Conferente não vê KPIs gerais da comunidade
+- [ ] Conferente consegue lançar entrada/saída (vinculada ao próprio grupo)
+- [ ] Conferente não acessa `/admin/financeiro/comprovantes` (exibe erro de permissão)
 
 ---
 

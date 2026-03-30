@@ -65,6 +65,212 @@ export type Database = {
         }
         Relationships: []
       }
+      grupos: {
+        Row: {
+          id: string
+          nome: string
+          descricao: string | null
+          endereco: string
+          latitude: number | null
+          longitude: number | null
+          telefone: string | null
+          email: string
+          imagem_url: string | null
+          lider_id: string
+          ativo: boolean
+          criado_em: string
+          atualizado_em: string
+        }
+        Insert: {
+          id?: string
+          nome: string
+          descricao?: string | null
+          endereco: string
+          latitude?: number | null
+          longitude?: number | null
+          telefone?: string | null
+          email: string
+          imagem_url?: string | null
+          lider_id: string
+          ativo?: boolean
+          criado_em?: string
+          atualizado_em?: string
+        }
+        Update: {
+          id?: string
+          nome?: string
+          descricao?: string | null
+          endereco?: string
+          latitude?: number | null
+          longitude?: number | null
+          telefone?: string | null
+          email?: string
+          imagem_url?: string | null
+          lider_id?: string
+          ativo?: boolean
+          criado_em?: string
+          atualizado_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grupos_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      membros_grupo: {
+        Row: {
+          id: string
+          grupo_id: string
+          perfil_id: string
+          cargo: string
+          data_entrada: string
+          data_saida: string | null
+          ativo: boolean
+        }
+        Insert: {
+          id?: string
+          grupo_id: string
+          perfil_id: string
+          cargo: string
+          data_entrada?: string
+          data_saida?: string | null
+          ativo?: boolean
+        }
+        Update: {
+          id?: string
+          grupo_id?: string
+          perfil_id?: string
+          cargo?: string
+          data_entrada?: string
+          data_saida?: string | null
+          ativo?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membros_grupo_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membros_grupo_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      reunioes_grupo: {
+        Row: {
+          id: string
+          grupo_id: string
+          titulo: string
+          descricao: string | null
+          dia_semana: number
+          horario: string
+          localizacao: string | null
+          criado_por: string
+          criado_em: string
+          atualizado_em: string
+        }
+        Insert: {
+          id?: string
+          grupo_id: string
+          titulo: string
+          descricao?: string | null
+          dia_semana: number
+          horario: string
+          localizacao?: string | null
+          criado_por: string
+          criado_em?: string
+          atualizado_em?: string
+        }
+        Update: {
+          id?: string
+          grupo_id?: string
+          titulo?: string
+          descricao?: string | null
+          dia_semana?: number
+          horario?: string
+          localizacao?: string | null
+          criado_por?: string
+          criado_em?: string
+          atualizado_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reunioes_grupo_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reunioes_grupo_criado_por_fkey"
+            columns: ["criado_por"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      avisos_grupo: {
+        Row: {
+          id: string
+          grupo_id: string
+          titulo: string
+          mensagem: string
+          tipo: string
+          data_envio: string
+          enviado_por: string
+          wa_message_id: string | null
+          criado_em: string
+        }
+        Insert: {
+          id?: string
+          grupo_id: string
+          titulo: string
+          mensagem: string
+          tipo: string
+          data_envio: string
+          enviado_por: string
+          wa_message_id?: string | null
+          criado_em?: string
+        }
+        Update: {
+          id?: string
+          grupo_id?: string
+          titulo?: string
+          mensagem?: string
+          tipo?: string
+          data_envio?: string
+          enviado_por?: string
+          wa_message_id?: string | null
+          criado_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_grupo_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avisos_grupo_enviado_por_fkey"
+            columns: ["enviado_por"]
+            isOneToOne: false
+            referencedRelation: "perfis"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -215,3 +421,88 @@ export type ConfiguracaoIgrejaRow = {
   nome_igreja: string | null
   updated_at: string | null
 }
+
+// ──────────────────────────────────────────────
+// Módulo Grupos Familiares
+// ──────────────────────────────────────────────
+
+export type TipoAcessoGrupo = 'pastor' | 'lider' | 'membro' | 'publico'
+export type CargoMembro = 'lider' | 'membro'
+export type TipoAviso = 'reuniao' | 'evento' | 'geral'
+
+export type GrupoRow = {
+  id: string
+  nome: string
+  descricao: string | null
+  endereco: string
+  latitude: number | null
+  longitude: number | null
+  telefone: string | null
+  email: string
+  imagem_url: string | null
+  lider_id: string
+  ativo: boolean
+  criado_em: string
+  atualizado_em: string
+}
+
+export type GrupoInsert = Omit<GrupoRow, 'id' | 'criado_em' | 'atualizado_em'> & {
+  id?: string
+  criado_em?: string
+  atualizado_em?: string
+}
+
+export type GrupoUpdate = Partial<Omit<GrupoRow, 'id' | 'criado_em' | 'atualizado_em'>>
+
+export type MembroGrupoRow = {
+  id: string
+  grupo_id: string
+  perfil_id: string
+  cargo: CargoMembro
+  data_entrada: string
+  data_saida: string | null
+  ativo: boolean
+}
+
+export type MembroGrupoInsert = Omit<MembroGrupoRow, 'id'>
+export type MembroGrupoUpdate = Partial<Omit<MembroGrupoRow, 'id' | 'grupo_id' | 'perfil_id'>>
+
+export type ReuniaoGrupoRow = {
+  id: string
+  grupo_id: string
+  titulo: string
+  descricao: string | null
+  dia_semana: number // 0 = segunda, 6 = domingo
+  horario: string // HH:MM format
+  localizacao: string | null
+  criado_por: string
+  criado_em: string
+  atualizado_em: string
+}
+
+export type ReuniaoGrupoInsert = Omit<ReuniaoGrupoRow, 'id' | 'criado_em' | 'atualizado_em'> & {
+  id?: string
+  criado_em?: string
+  atualizado_em?: string
+}
+
+export type ReuniaoGrupoUpdate = Partial<Omit<ReuniaoGrupoRow, 'id' | 'grupo_id' | 'criado_em' | 'atualizado_em'>>
+
+export type AvisoGrupoRow = {
+  id: string
+  grupo_id: string
+  titulo: string | null
+  mensagem: string
+  tipo: TipoAviso
+  data_envio: string
+  enviado_por: string
+  wa_message_id: string | null
+  criado_em: string
+}
+
+export type AvisoGrupoInsert = Omit<AvisoGrupoRow, 'id' | 'criado_em'> & {
+  id?: string
+  criado_em?: string
+}
+
+export type AvisoGrupoUpdate = Partial<Omit<AvisoGrupoRow, 'id' | 'grupo_id' | 'criado_em'>>

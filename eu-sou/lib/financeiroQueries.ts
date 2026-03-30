@@ -16,11 +16,27 @@ export type LancamentoFiltro = {
   categoria_id?: string
 }
 
+export type MesDado = {
+  mes: string    // "out/25"
+  mesKey: string // "2025-10"
+  entradas: number // centavos
+  saidas: number   // centavos
+}
+
+export type CategoriaDado = {
+  categoria: string
+  valor: number // centavos
+}
+
 export type DashboardData = {
-  saldoAtual: number // em centavos
-  totalEntradaMes: number // centavos
-  totalSaidaMes: number // centavos
+  saldoAtual: number               // saldo do mês em centavos
+  totalEntradaMes: number          // centavos
+  totalSaidaMes: number            // centavos
+  saldoAcumulado: number           // acumulado geral em centavos
   vencimentosProximos: LancamentoRow[]
+  comprovantesNaoConfirmados: number
+  ultimosSeisMeses: MesDado[]
+  entradasPorCategoria: CategoriaDado[]
 }
 
 export function centavosParaReais(centavos: number): number {
@@ -50,6 +66,27 @@ export function parseCentavos(valor: string): number {
   return Math.round(num * 100)
 }
 
+export function calcularUltimos6Meses(
+  lancamentos: LancamentoRow[],
+  hoje: Date = new Date()
+): MesDado[] {
+  const meses: MesDado[] = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1)
+    const mesKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const mes = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')
+    meses.push({ mes, mesKey, entradas: 0, saidas: 0 })
+  }
+  for (const l of lancamentos) {
+    const mesKey = l.data.slice(0, 7)
+    const mesDado = meses.find(m => m.mesKey === mesKey)
+    if (!mesDado) continue
+    if (l.tipo === 'entrada') mesDado.entradas += l.valor
+    else if (l.tipo === 'saida') mesDado.saidas += l.valor
+  }
+  return meses
+}
+
 export function calcularDashboardData(
   lancamentos: LancamentoRow[],
   diasProximos = 7
@@ -60,6 +97,7 @@ export function calcularDashboardData(
 
   let totalEntradaMes = 0
   let totalSaidaMes = 0
+  let saldoAcumulado = 0
 
   const proximos = [] as LancamentoRow[]
   const maxDate = new Date(today)
@@ -67,6 +105,9 @@ export function calcularDashboardData(
 
   for (const l of lancamentos) {
     const data = new Date(l.data)
+
+    if (l.tipo === 'entrada') saldoAcumulado += l.valor
+    else if (l.tipo === 'saida') saldoAcumulado -= l.valor
 
     if (data >= inicioMes && data <= fimMes) {
       if (l.tipo === 'entrada') totalEntradaMes += l.valor
@@ -88,7 +129,16 @@ export function calcularDashboardData(
     return new Date(a.data_vencimento).getTime() - new Date(b.data_vencimento).getTime()
   })
 
-  return { saldoAtual, totalEntradaMes, totalSaidaMes, vencimentosProximos: proximos }
+  return {
+    saldoAtual,
+    totalEntradaMes,
+    totalSaidaMes,
+    saldoAcumulado,
+    vencimentosProximos: proximos,
+    comprovantesNaoConfirmados: 0,
+    ultimosSeisMeses: calcularUltimos6Meses(lancamentos),
+    entradasPorCategoria: [],
+  }
 }
 
 export async function getCategorias(): Promise<CategoriaFinanceiroRow[]> {
@@ -139,31 +189,37 @@ export async function atualizarVencidos(): Promise<number> {
   return (data ?? []).length
 }
 
-export async function getVencimentosProximos(dias = 7): Promise<LancamentoRow[]> {
+export async function getVencimentosProximos(dias = 7, grupo_id?: string): Promise<LancamentoRow[]> {
   const hoje = new Date().toISOString().slice(0, 10)
   const final = new Date()
   final.setDate(final.getDate() + dias)
   const finalStr = final.toISOString().slice(0, 10)
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('lancamentos')
     .select('*')
     .in('status', ['pendente', 'vencido'])
     .gte('data_vencimento', hoje)
     .lte('data_vencimento', finalStr)
-    .order('data_vencimento', { ascending: true })
+
+  if (grupo_id) query = query.eq('grupo_id', grupo_id)
+
+  const { data, error } = await query.order('data_vencimento', { ascending: true })
 
   if (error) throw error
   return (data ?? []) as LancamentoRow[]
 }
 
-export async function getComprovantesNaoConfirmados(): Promise<LancamentoRow[]> {
-  const { data, error } = await supabase
+export async function getComprovantesNaoConfirmados(grupo_id?: string): Promise<LancamentoRow[]> {
+  let query = supabase
     .from('lancamentos')
     .select('*')
     .in('status', ['pendente', 'vencido'])
     .not('comprovante_url', 'is', null)
-    .order('data', { ascending: false })
+
+  if (grupo_id) query = query.eq('grupo_id', grupo_id)
+
+  const { data, error } = await query.order('data', { ascending: false })
 
   if (error) throw error
   return (data ?? []) as LancamentoRow[]
@@ -206,9 +262,32 @@ export async function getConfiguracaoIgreja(): Promise<ConfiguracaoIgrejaRow | n
   return data as ConfiguracaoIgrejaRow
 }
 
-export async function getDashboardData(diasProximos = 7): Promise<DashboardData> {
-  const lancamentos = await getLancamentos({})
-  const vencimentosProximos = await getVencimentosProximos(diasProximos)
+export async function getDashboardData(diasProximos = 7, grupo_id?: string): Promise<DashboardData> {
+  const filtro: LancamentoFiltro = grupo_id ? { grupo_id } : {}
+  const [lancamentos, vencimentosProximos, comprovantes, categorias] = await Promise.all([
+    getLancamentos(filtro),
+    getVencimentosProximos(diasProximos, grupo_id),
+    getComprovantesNaoConfirmados(grupo_id),
+    getCategorias(),
+  ])
+
   const calculado = calcularDashboardData(lancamentos, diasProximos)
-  return { ...calculado, vencimentosProximos }
+
+  const categoriasMap = new Map(categorias.map(c => [c.id, c.nome]))
+  const entradasMap = new Map<string, number>()
+  for (const l of lancamentos) {
+    if (l.tipo !== 'entrada') continue
+    const nome = categoriasMap.get(l.categoria_id) ?? 'Outros'
+    entradasMap.set(nome, (entradasMap.get(nome) ?? 0) + l.valor)
+  }
+  const entradasPorCategoria: CategoriaDado[] = Array.from(entradasMap.entries())
+    .map(([categoria, valor]) => ({ categoria, valor }))
+    .sort((a, b) => b.valor - a.valor)
+
+  return {
+    ...calculado,
+    vencimentosProximos,
+    comprovantesNaoConfirmados: comprovantes.length,
+    entradasPorCategoria,
+  }
 }

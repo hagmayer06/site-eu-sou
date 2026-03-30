@@ -59,7 +59,26 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Rotas /admin/* (exceto financeiro) exigem pastor ou tesoureiro
+  // Rotas /admin/grupos/* exigem papel pastor ou lider
+  if (pathname.startsWith('/admin/grupos')) {
+    const { data: perfil } = await supabase
+      .from('perfis')
+      .select('papeis')
+      .eq('id', user.id)
+      .single()
+
+    const papeis: string[] = perfil?.papeis ?? []
+    const podeAcessarGrupos =
+      papeis.includes('pastor') || papeis.includes('lider')
+
+    if (!podeAcessarGrupos) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/membro'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Rotas /admin/* (exceto financeiro e grupos) exigem pastor ou tesoureiro
   if (pathname.startsWith('/admin')) {
     const { data: perfil } = await supabase
       .from('perfis')

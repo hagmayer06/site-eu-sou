@@ -32,7 +32,11 @@ create table if not exists perfis (
 -- Cria perfil automaticamente ao registrar novo usuário
 -- ------------------------------------------------------------
 create or replace function handle_new_eu_sou_user()
-returns trigger as $$
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
   insert into perfis (id, nome)
   values (
@@ -41,7 +45,7 @@ begin
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 create trigger on_auth_user_created_eu_sou
   after insert on auth.users

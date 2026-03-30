@@ -368,6 +368,12 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# [functions.avisos-vencimento]
+# Avisa tesoureiros sobre lançamentos pendentes que vencem em 3 dias.
+# Cron: todo dia às 08h00 (UTC-3 / BRT = 11h00 UTC)
+# schedule = "0 11 * * *"
+# Deploy com cron: supabase functions deploy avisos-vencimento --schedule "0 11 * * *"
+
 [analytics]
 enabled = true
 port = 54327
