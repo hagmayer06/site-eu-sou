@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { criarEvento, editarEvento, EventoInsert, EventoRow } from '@/lib/eventosQueries'
+import { type EventoInsert, type EventoRow } from '@/lib/eventosQueries'
+import { criarEventoAction, editarEventoAction } from '@/app/admin/eventos/actions' // <--- IMPORT SEGURO
 import { Calendar, Clock, MapPin, AlignLeft, Type, Loader2, X, ImageIcon, Upload } from 'lucide-react'
 
 interface EventoFormProps {
@@ -20,7 +21,7 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
     data: '',
     horario: '',
     local: '',
-    imagem_url: '', // <-- Inicializa vazio
+    imagem_url: '',
     ativo: true,
   }
 
@@ -41,7 +42,7 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
         ativo: eventoParaEditar.ativo,
       })
     } else {
-      setFormData(estadoInicial)
+      setFormData(estadoInitial)
     }
   }, [eventoParaEditar])
 
@@ -53,7 +54,7 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
       if (!file) return
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}` // Nome aleatório para evitar conflito
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
       const filePath = `banners/${fileName}`
 
       // 1. Sobe para o Storage
@@ -82,17 +83,26 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setEnviando(true)
+    setMensagem(null)
+
     try {
+      let resultado;
+
       if (eventoParaEditar?.id) {
-        await editarEvento(eventoParaEditar.id, formData)
+        resultado = await editarEventoAction(eventoParaEditar.id, formData)
       } else {
-        await criarEvento(formData)
+        resultado = await criarEventoAction(formData)
       }
-      setFormData(estadoInicial)
-      onSuccess()
-      if (onCancelar) onCancelar()
+
+      if (resultado.erro) {
+        setMensagem({ tipo: 'erro', texto: resultado.erro })
+      } else {
+        setFormData(estadoInicial)
+        onSuccess()
+        if (onCancelar) onCancelar()
+      }
     } catch (error) {
-      setMensagem({ tipo: 'erro', texto: 'Erro ao salvar evento.' })
+      setMensagem({ tipo: 'erro', texto: 'Erro de segurança ao salvar.' })
     } finally {
       setEnviando(false)
     }
@@ -101,7 +111,7 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
   return (
     <div className="w-full max-w-2xl mx-auto bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl relative">
       {eventoParaEditar && (
-        <button onClick={onCancelar} className="absolute top-6 right-6 text-zinc-500 hover:text-white"><X /></button>
+        <button type="button" onClick={onCancelar} className="absolute top-6 right-6 text-zinc-500 hover:text-white"><X /></button>
       )}
 
       <h2 className="text-2xl font-black text-white uppercase mb-8 italic border-l-4 border-[#ff6b00] pl-4">
@@ -137,12 +147,11 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
           </div>
         </div>
 
-        {/* INPUTS DE TEXTO (Título, Data, etc - Mantendo o estilo) */}
         <div className="space-y-4">
           <input required name="titulo" value={formData.titulo} onChange={(e) => setFormData({...formData, titulo: e.target.value})} placeholder="Título do Evento" className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#ff6b00] outline-none text-sm font-bold" />
           
           <div className="grid grid-cols-2 gap-4">
-            <input type="date" name="data" value={formData.data} onChange={(e) => setFormData({...formData, data: e.target.value})} className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#ff6b00] outline-none text-sm [color-scheme:dark]" />
+            <input type="date" required name="data" value={formData.data} onChange={(e) => setFormData({...formData, data: e.target.value})} className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#ff6b00] outline-none text-sm [color-scheme:dark]" />
             <input name="horario" value={formData.horario || ''} onChange={(e) => setFormData({...formData, horario: e.target.value})} placeholder="Horário (ex: 19:30)" className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-[#ff6b00] outline-none text-sm" />
           </div>
           

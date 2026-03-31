@@ -1,15 +1,29 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getSession } from '@/lib/auth'; // <--- BLINDAGEM
 import { revalidatePath } from 'next/cache';
+
+/**
+ * Validação de Segurança Centralizada
+ */
+async function validarAcessoAdmin() {
+  const user = await getSession();
+  if (!user) {
+    throw new Error('Acesso negado: Usuário não autenticado.');
+  }
+  return user;
+}
 
 export async function atualizarSerieAction(formData: FormData) {
   try {
+    await validarAcessoAdmin(); // <--- BLINDAGEM OBRIGATÓRIA
+
     const id = formData.get('id') as string;
     const imagemFile = formData.get('imagem_nova') as File | null;
     let finalImageUrl = formData.get('imagem_url_atual') as string;
 
-    // 1. Se tiver imagem nova, faz o upload pelo servidor
+    // 1. Upload Seguro pelo Servidor
     if (imagemFile && imagemFile.size > 0) {
       const fileExt = imagemFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
@@ -28,7 +42,7 @@ export async function atualizarSerieAction(formData: FormData) {
       finalImageUrl = publicUrlData.publicUrl;
     }
 
-    // 2. Atualiza o banco de dados
+    // 2. Atualização Blindada no Banco
     const { error: updateError } = await supabaseAdmin
       .from('serie_do_mes')
       .update({
@@ -47,12 +61,11 @@ export async function atualizarSerieAction(formData: FormData) {
 
     if (updateError) throw updateError;
 
-    // 3. Limpa o cache para o site público atualizar na hora
     revalidatePath('/');
     
     return { success: true };
   } catch (error: any) {
-    console.error("Erro na Action:", error);
-    return { success: false, error: error.message };
+    console.error("Tentativa de atualização não autorizada ou erro:", error.message);
+    return { success: false, error: 'Ação não permitida.' };
   }
 }
