@@ -4,6 +4,7 @@ import type { Grupo } from "./gruposQueries";
 export type GrupoInput = {
   nome?: string;
   lider: string;
+  telefone: string;
   bairro: string;
   dia_semana: string;
   horario: string;

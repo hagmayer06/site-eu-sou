@@ -1,51 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import SerieForm from '@/components/admin-fomularios/SerieForm';
-import LoginPage from '../login/page';
 
 export default function AdminSeriePage() {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/admin/login';
+  };
 
-  useEffect(() => {
-    // 1. Verifica a sessão na abertura da aba
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setLoading(false);
-    };
-
-    getInitialSession();
-
-    // 2. Escuta mudanças em tempo real
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (_event === 'SIGNED_OUT') {
-        setSession(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-orange-500 animate-pulse font-black tracking-tighter text-xl">
-          SISTEMA <span className="text-white uppercase">Eu Sou</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Se NÃO tem sessão (ou fechou a aba antes), mostra LOGIN
-  if (!session) {
-    return <LoginPage />;
-  }
-
-  // Se TEM sessão, mostra o PAINEL
   return (
     <div className="min-h-screen bg-zinc-950 text-white p-6 md:p-10 pt-28">
       <div className="max-w-4xl mx-auto">
@@ -58,10 +21,7 @@ export default function AdminSeriePage() {
           </div>
           
           <button 
-            onClick={async () => {
-              await supabase.auth.signOut();
-              // O estado 'session' vai virar null via onAuthStateChange e a tela muda na hora
-            }}
+            onClick={handleSignOut}
             className="group flex items-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2.5 rounded-full text-xs font-black transition-all border border-red-500/20"
           >
             <span>ENCERRAR SESSÃO</span>

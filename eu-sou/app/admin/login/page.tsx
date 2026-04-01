@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   
   const router = useRouter();
-  const pathname = usePathname(); // <--- NOVO: Descobre em qual URL estamos
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,17 +29,16 @@ export default function LoginPage() {
         setLoading(false);
       } else {
         console.log("Sucesso! Autenticado.");
-        // Removi o router.push() forçado daqui!
         
-        // Se o usuário acessou a rota de login diretamente (ex: /admin/login), 
-        // aí sim a gente empurra ele pra algum painel padrão.
-        if (pathname === '/admin/login' || pathname === '/admin') {
-           await new Promise(resolve => setTimeout(resolve, 500));
-           router.push('/admin/eventos'); // Escolha qual será o painel padrão
-        }
+        // Descobre para onde o usuário queria ir (padrão: /admin/eventos)
+        const next = searchParams.get('next') || '/admin/eventos';
         
-        // Se ele já estiver em /admin/eventos ou /admin/serie, 
-        // não fazemos NADA. O estado reativo do pai vai trocar a tela sozinho!
+        // Segurança: Proteção contra Open Redirect (garante que é um link interno)
+        const destination = next.startsWith('/') ? next : '/admin/eventos';
+
+        // Pequeno delay para garantir que o cookie do Supabase seja processado
+        await new Promise(resolve => setTimeout(resolve, 500));
+        router.push(destination);
       }
     } catch (err) {
       setError('Erro inesperado ao tentar logar.');

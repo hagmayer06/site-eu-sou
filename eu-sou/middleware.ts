@@ -42,10 +42,13 @@ export async function middleware(request: NextRequest) {
 
   // Se o usuário tentar acessar qualquer rota no /admin (exceto o login) sem estar logado
   if (!user && request.nextUrl.pathname.startsWith('/admin') && request.nextUrl.pathname !== '/admin/login') {
-    return NextResponse.redirect(new URL('/admin/login', request.url))
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/login'
+    url.searchParams.set('next', request.nextUrl.pathname) // Salva onde o usuário queria ir
+    return NextResponse.redirect(url)
   }
 
-  // Se o usuário já estiver logado e tentar acessar o login, manda pro painel
+  // Se o usuário já estiver logado e tentar acessar o login, manda pro painel padrão
   if (user && request.nextUrl.pathname === '/admin/login') {
     return NextResponse.redirect(new URL('/admin/eventos', request.url))
   }

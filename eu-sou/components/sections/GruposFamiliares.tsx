@@ -37,14 +37,14 @@ function useIntersectionAnimation(threshold = 0.15) {
 
 function GrupoCardSkeleton() {
   return (
-    <div className="relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col animate-pulse">
+    <div className="relative bg-black border border-orange-500/40 rounded-2xl overflow-hidden flex flex-col animate-pulse">
       <div className="h-[3px] w-full bg-orange-500/30" />
       <div className="p-6 flex flex-col flex-1 gap-4">
-        <div className="h-6 w-20 rounded-full bg-white/10" />
+        <div className="h-6 w-20 rounded-full bg-orange-500/10" />
         <div className="h-5 w-3/4 rounded bg-white/10" />
         <div className="h-4 w-1/2 rounded bg-white/10" />
         <div className="mt-auto space-y-3">
-          <div className="h-9 w-full rounded-lg bg-white/10" />
+          <div className="h-9 w-full rounded-lg bg-orange-500/10" />
           <div className="h-4 w-full rounded bg-white/10" />
           <div className="h-4 w-2/3 rounded bg-white/10" />
         </div>
@@ -58,59 +58,68 @@ function GrupoCardSkeleton() {
 function GrupoCard({ grupo }: { grupo: Grupo }) {
   try {
     const diaAbrev = grupo.dia_semana.split("-")[0];
-    const horarioFormatado = grupo.horario.slice(0, 5); // "19:30:00" → "19:30"
-    
-    console.log('🎴 Renderizando card do grupo:', grupo.nome, 'dia_semana:', grupo.dia_semana, 'diaAbrev:', diaAbrev);
+    const horarioFormatado = grupo.horario.slice(0, 5);
+
+    // Sanitização para o WhatsApp
+    const telefoneLimpo = grupo.telefone?.replace(/\D/g, "");
+    const mensagem = encodeURIComponent(`Olá! Gostaria de saber mais sobre o Grupo Familiar ${grupo.nome || grupo.bairro}.`);
+    const waLink = `https://wa.me/${telefoneLimpo}?text=${mensagem}`;
 
     return (
-    <div
-      className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:border-orange-500/50 transition-colors duration-500 flex flex-col animate-fade-in"
-    >
-      {/* Barra de acento */}
-      <div className="h-[3px] w-full bg-gradient-to-r from-orange-500 to-orange-500/30" />
+      <div className="group relative bg-black border border-orange-500 rounded-2xl overflow-hidden hover:border-orange-400 hover:shadow-[0_0_24px_rgba(255,107,0,0.25)] transition-all duration-500 flex flex-col animate-fade-in">
+        <div className="p-6 flex flex-col flex-1">
+          {/* Badge do dia */}
+          <span className="inline-flex items-center self-start px-3 py-1 rounded-full bg-orange-500/15 text-orange-400 text-xs font-semibold tracking-widest uppercase mb-4">
+            {diaAbrev}
+          </span>
 
-      <div className="p-6 flex flex-col flex-1">
-        {/* Badge do dia */}
-        <span className="inline-flex items-center self-start px-3 py-1 rounded-full bg-orange-500/15 text-orange-400 text-xs font-semibold tracking-widest uppercase mb-4">
-          {diaAbrev}
-        </span>
+          {/* Nome e líder */}
+          <h3 className="text-xl font-bold text-white mb-1 leading-tight">
+            {grupo.nome || grupo.bairro}
+          </h3>
+          <p className="text-orange-400/80 text-sm mb-6">{grupo.lider}</p>
 
-        {/* Nome e líder */}
-        <h3 className="text-xl font-bold text-white mb-1 leading-tight">
-          {grupo.nome || grupo.bairro}
-        </h3>
-        <p className="text-orange-400/80 text-sm mb-6">{grupo.lider}</p>
+          {/* Detalhes */}
+          <div className="mt-auto space-y-3">
+            {/* Dia + horário em destaque */}
+            <div className="flex items-center gap-3 bg-orange-500/10 rounded-lg px-3 py-2">
+              <Clock className="w-4 h-4 text-orange-400 shrink-0" />
+              <span className="text-orange-300 text-sm font-semibold">
+                {grupo.dia_semana} · {horarioFormatado}
+              </span>
+            </div>
 
-        {/* Detalhes */}
-        <div className="mt-auto space-y-3">
-          {/* Dia + horário em destaque */}
-          <div className="flex items-center gap-3 bg-orange-500/10 rounded-lg px-3 py-2">
-            <Clock className="w-4 h-4 text-orange-400 shrink-0" />
-            <span className="text-orange-300 text-sm font-semibold">
-              {grupo.dia_semana} · {horarioFormatado}
-            </span>
+            {grupo.endereco && (
+              <div className="flex items-start gap-3 text-white/50 text-sm">
+                <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                <span>{grupo.endereco}</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 text-white/50 text-sm">
+              <Users className="w-4 h-4 text-orange-500 shrink-0" />
+              <span>{grupo.bairro}</span>
+            </div>
           </div>
 
-          {grupo.endereco && (
-            <div className="flex items-start gap-3 text-white/50 text-sm">
-              <MapPin className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-              <span>{grupo.endereco}</span>
+          {/* CTA no hover — agora funcional */}
+          {telefoneLimpo ? (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 flex items-center gap-2 text-orange-400 text-xs font-bold tracking-widest uppercase opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:text-orange-300"
+            >
+              <span>PARTICIPAR</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          ) : (
+            <div className="mt-5 text-white/20 text-[10px] uppercase tracking-widest italic">
+              Contato indisponível
             </div>
           )}
-
-          <div className="flex items-center gap-3 text-white/50 text-sm">
-            <Users className="w-4 h-4 text-orange-500 shrink-0" />
-            <span>{grupo.bairro}</span>
-          </div>
-        </div>
-
-        {/* CTA no hover */}
-        <div className="mt-5 flex items-center gap-2 text-orange-400 text-xs font-bold tracking-widest uppercase opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-          <span>PARTICIPAR</span>
-          <ArrowRight className="w-4 h-4" />
         </div>
       </div>
-    </div>
     );
   } catch (err) {
     console.error('❌ Erro ao renderizar card:', err, 'grupo:', grupo);
@@ -128,11 +137,6 @@ export default function GruposFamiliares() {
   useEffect(() => {
     async function buscar() {
       const data = await getGrupos();
-      console.log('📍 Dados recebidos em GruposFamiliares:', data);
-      console.log('📍 Quantidade de grupos:', data.length);
-      if (data.length > 0) {
-        console.log('📍 Primeiro grupo:', data[0]);
-      }
       setGrupos(data);
       setLoading(false);
     }
@@ -142,16 +146,29 @@ export default function GruposFamiliares() {
   return (
     <section
       id="grupos"
-      className="relative py-24 md:py-32 overflow-hidden bg-zinc-950"
+      className="relative py-24 md:py-32 overflow-hidden bg-black"
     >
-      {/* Gradiente decorativo */}
-      <div
-        className="absolute inset-0 opacity-30 pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,107,0,0.08) 0%, transparent 70%)",
-        }}
-      />
+      {/* Linhas laranjas decorativas — SVG inline */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+      >
+        {/* Linha diagonal longa — canto superior esquerdo ao inferior direito */}
+        <line x1="0" y1="18%" x2="100%" y2="72%" stroke="#ff6b00" strokeWidth="1" strokeOpacity="0.18" />
+        {/* Linha diagonal inversa */}
+        <line x1="0" y1="85%" x2="60%" y2="0" stroke="#ff6b00" strokeWidth="0.8" strokeOpacity="0.10" />
+        {/* Linha horizontal sutil no topo */}
+        <line x1="0" y1="12%" x2="100%" y2="12%" stroke="#ff6b00" strokeWidth="0.8" strokeOpacity="0.12" />
+        {/* Linha horizontal sutil na base */}
+        <line x1="0" y1="90%" x2="100%" y2="90%" stroke="#ff6b00" strokeWidth="0.8" strokeOpacity="0.10" />
+        {/* Linha vertical sutil esquerda */}
+        <line x1="8%" y1="0" x2="8%" y2="100%" stroke="#ff6b00" strokeWidth="0.8" strokeOpacity="0.08" />
+        {/* Linha vertical sutil direita */}
+        <line x1="92%" y1="0" x2="92%" y2="100%" stroke="#ff6b00" strokeWidth="0.8" strokeOpacity="0.08" />
+      </svg>
+
+
 
       <div ref={sectionRef} className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header */}
@@ -190,14 +207,12 @@ export default function GruposFamiliares() {
 
         {/* Grid de cards */}
         {loading ? (
-          // Skeleton — mantém o layout enquanto carrega
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <GrupoCardSkeleton key={i} />
             ))}
           </div>
         ) : grupos.length === 0 ? (
-          // Estado vazio
           <div className="text-center py-16">
             <p className="text-white/30 text-lg">
               Nenhum grupo ativo no momento.
@@ -207,7 +222,6 @@ export default function GruposFamiliares() {
             </p>
           </div>
         ) : (
-          // Cards reais
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {grupos.map((grupo) => (
               <GrupoCard key={grupo.id} grupo={grupo} />
@@ -251,11 +265,11 @@ export default function GruposFamiliares() {
             transform: translateY(0);
           }
         }
-        
+
         .animate-fade-in {
           animation: fadeIn 0.5s ease-out forwards;
         }
-        
+
         [data-animate].animate-in {
           opacity: 1 !important;
           transform: none !important;

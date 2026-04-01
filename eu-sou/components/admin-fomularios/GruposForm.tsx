@@ -7,6 +7,7 @@ import type { Grupo } from "@/lib/gruposQueries";
 type GrupoFormData = {
   nome: string;
   lider: string;
+  telefone: string;
   bairro: string;
   dia_semana: string;
   horario: string;
@@ -32,6 +33,7 @@ type Props = {
 const camposVazios: GrupoFormData = {
   nome: "",
   lider: "",
+  telefone: "",
   bairro: "",
   dia_semana: "",
   horario: "",
@@ -51,6 +53,7 @@ export default function GruposForm({ grupoEditando, onSucesso, onCancelar }: Pro
       setCampos({
         nome: grupoEditando.nome ?? "",
         lider: grupoEditando.lider,
+        telefone: grupoEditando.telefone ?? "",
         bairro: grupoEditando.bairro,
         dia_semana: grupoEditando.dia_semana,
         horario: grupoEditando.horario.slice(0, 5), // "19:30:00" → "19:30"
@@ -72,7 +75,7 @@ export default function GruposForm({ grupoEditando, onSucesso, onCancelar }: Pro
     setFeedback(null);
 
     // Validação mínima
-    if (!campos.lider || !campos.bairro || !campos.dia_semana || !campos.horario) {
+    if (!campos.lider || !campos.telefone || !campos.bairro || !campos.dia_semana || !campos.horario) {
       setFeedback({ tipo: "erro", mensagem: "Preencha todos os campos obrigatórios." });
       setSalvando(false);
       return;
@@ -138,6 +141,24 @@ export default function GruposForm({ grupoEditando, onSucesso, onCancelar }: Pro
           required
           className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-orange-500/60 transition-colors"
         />
+      </div>
+
+      {/* Telefone — obrigatório */}
+      <div>
+        <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">
+          Telefone (WhatsApp) <span className="text-orange-500">*</span>
+        </label>
+        <input
+          type="tel"
+          value={campos.telefone}
+          onChange={(e) => atualizar("telefone", e.target.value)}
+          placeholder="ex: 5511999999999"
+          required
+          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-orange-500/60 transition-colors"
+        />
+        <p className="text-[10px] text-white/30 mt-1 italic">
+          Inclua o código do país e DDD (somente números).
+        </p>
       </div>
 
       {/* Bairro — obrigatório */}

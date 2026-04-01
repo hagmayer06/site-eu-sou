@@ -4,6 +4,7 @@ export type Grupo = {
   id: string;
   nome: string | null;
   lider: string;
+  telefone: string | null;
   bairro: string;
   dia_semana: string;
   horario: string;
