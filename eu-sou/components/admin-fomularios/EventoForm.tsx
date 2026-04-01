@@ -42,7 +42,7 @@ export default function EventoForm({ onSuccess, eventoParaEditar, onCancelar }: 
         ativo: eventoParaEditar.ativo,
       })
     } else {
-      setFormData(estadoInitial)
+      setFormData(estadoInicial)
     }
   }, [eventoParaEditar])
 
