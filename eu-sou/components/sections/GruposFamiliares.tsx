@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { MapPin, Clock, Users, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { MapPin, Clock, Users, ArrowRight, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
+import useEmblaCarousel from "embla-carousel-react";
 import { getGrupos, type Grupo } from "@/lib/gruposQueries";
 
 // ─── Animação de entrada ──────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ function useIntersectionAnimation(threshold = 0.15) {
 
 function GrupoCardSkeleton() {
   return (
-    <div className="relative bg-black border border-orange-500/40 rounded-2xl overflow-hidden flex flex-col animate-pulse min-w-[280px] w-full">
+    <div className="relative bg-black border border-orange-500/40 rounded-2xl overflow-hidden flex flex-col animate-pulse w-full">
       <div className="p-6 flex flex-col flex-1 gap-4">
         <div className="h-6 w-20 rounded-full bg-orange-500/10" />
         <div className="h-5 w-3/4 rounded bg-white/10" />
@@ -53,13 +54,19 @@ function GrupoCardSkeleton() {
 
 // ─── Card ────────────────────────────────────────────────────────────────────
 
-function GrupoCard({ grupo }: { grupo: Grupo }) {
+function GrupoCard({ grupo, index }: { grupo: Grupo; index: number }) {
   try {
     const diaAbrev = grupo.dia_semana.split("-")[0];
     const horarioFormatado = grupo.horario.slice(0, 5);
 
     return (
-      <div className="group relative bg-black border border-orange-500 rounded-2xl overflow-hidden hover:border-orange-400 hover:shadow-[0_0_24px_rgba(255,107,0,0.25)] transition-all duration-500 flex flex-col h-full">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: index * 0.1, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="group relative bg-black border border-orange-500 rounded-2xl overflow-hidden hover:border-orange-400 hover:shadow-[0_0_24px_rgba(255,107,0,0.25)] transition-all duration-500 flex flex-col h-full"
+      >
         <div className="p-6 flex flex-col flex-1">
           <span className="inline-flex items-center self-start px-3 py-1 rounded-full bg-orange-500/15 text-orange-400 text-xs font-semibold tracking-widest uppercase mb-4">
             {diaAbrev}
@@ -93,103 +100,12 @@ function GrupoCard({ grupo }: { grupo: Grupo }) {
             <ArrowRight className="w-4 h-4" />
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   } catch (err) {
     console.error("❌ Erro ao renderizar card:", err);
     return null;
   }
-}
-
-// ─── Carrossel de grupos ──────────────────────────────────────────────────────
-
-function CarrosselGrupos({ grupos }: { grupos: Grupo[] }) {
-  const [atual, setAtual] = useState(0);
-  const total = grupos.length;
-
-  // Quantos cards mostrar por vez dependendo da largura
-  // Usamos state para controlar via JS (mais confiável que só CSS para carrossel)
-  const [porVez, setPorVez] = useState(4);
-
-  useEffect(() => {
-    function atualizar() {
-      if (window.innerWidth < 640) setPorVez(1);
-      else if (window.innerWidth < 1024) setPorVez(2);
-      else setPorVez(4);
-    }
-    atualizar();
-    window.addEventListener("resize", atualizar);
-    return () => window.removeEventListener("resize", atualizar);
-  }, []);
-
-  const maxIndex = Math.max(0, total - porVez);
-
-  function anterior() {
-    setAtual((prev) => Math.max(0, prev - 1));
-  }
-
-  function proximo() {
-    setAtual((prev) => Math.min(maxIndex, prev + 1));
-  }
-
-  const gruposVisiveis = grupos.slice(atual, atual + porVez);
-
-  return (
-    <div className="relative">
-      {/* Cards */}
-      <div className="overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={atual}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="grid gap-4"
-            style={{ gridTemplateColumns: `repeat(${porVez}, minmax(0, 1fr))` }}
-          >
-            {gruposVisiveis.map((grupo) => (
-              <GrupoCard key={grupo.id} grupo={grupo} />
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Controles */}
-      <div className="flex items-center justify-center gap-4 mt-8">
-        <button
-          onClick={anterior}
-          disabled={atual === 0}
-          className="p-2 rounded-full border border-orange-500/40 text-orange-500 hover:bg-orange-500/10 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        {/* Dots */}
-        <div className="flex gap-2">
-          {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setAtual(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === atual
-                  ? "w-6 h-2 bg-orange-500"
-                  : "w-2 h-2 bg-orange-500/30 hover:bg-orange-500/60"
-              }`}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={proximo}
-          disabled={atual === maxIndex}
-          className="p-2 rounded-full border border-orange-500/40 text-orange-500 hover:bg-orange-500/10 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
 }
 
 // ─── Seção principal ──────────────────────────────────────────────────────────
@@ -199,6 +115,13 @@ export default function GruposFamiliares() {
   const [loading, setLoading] = useState(true);
   const sectionRef = useIntersectionAnimation();
 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    loop: false,
+    slidesToScroll: 1,
+  });
+  const [current, setCurrent] = useState(0);
+
   useEffect(() => {
     async function buscar() {
       const data = await getGrupos();
@@ -207,6 +130,15 @@ export default function GruposFamiliares() {
     }
     buscar();
   }, []);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    setCurrent(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", () => setCurrent(emblaApi.selectedScrollSnap()));
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
     <section id="grupos" className="relative py-24 md:py-32 overflow-hidden bg-black">
@@ -222,18 +154,31 @@ export default function GruposFamiliares() {
 
       <div ref={sectionRef} className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="grid md:grid-cols-2 gap-8 items-end mb-16">
-          <div data-animate style={{ opacity: 0, transform: "translateX(-30px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
-            <p className="text-orange-500 text-xs font-bold tracking-[0.3em] uppercase mb-4">COMUNIDADE</p>
-            <h2 className="font-black text-5xl md:text-7xl leading-none tracking-tight">
-              <span className="text-white block">GRUPOS</span>
-              <span className="text-orange-500 block">FAMILIARES</span>
-            </h2>
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <div data-animate style={{ opacity: 0, transform: "translateX(-30px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
+              <p className="text-orange-500 text-xs font-bold tracking-[0.3em] uppercase mb-4">COMUNIDADE</p>
+              <h2 className="font-black text-5xl md:text-7xl leading-none tracking-tight">
+                <span className="text-white block">GRUPOS</span>
+                <span className="text-orange-500 block">FAMILIARES</span>
+              </h2>
+            </div>
           </div>
-          <div data-animate style={{ opacity: 0, transform: "translateX(30px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}>
-            <p className="text-white/50 text-lg md:text-right max-w-md md:ml-auto leading-relaxed">
-              Encontre um grupo perto de você e faça parte de uma família que cresce junta na fé. Cada grupo é um lar espiritual.
-            </p>
+
+          {/* Setas — visíveis só no desktop */}
+          <div className="hidden md:flex gap-3">
+            <button
+              onClick={scrollPrev}
+              className="w-14 h-14 rounded-full border-2 border-orange-500 flex items-center justify-center text-orange-500 hover:bg-orange-500 hover:text-white transition-all active:scale-90"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={scrollNext}
+              className="w-14 h-14 rounded-full border-2 border-orange-500 flex items-center justify-center text-orange-500 hover:bg-orange-500 hover:text-white transition-all active:scale-90"
+            >
+              <ArrowRight className="w-6 h-6" />
+            </button>
           </div>
         </div>
 
@@ -248,12 +193,38 @@ export default function GruposFamiliares() {
             <p className="text-white/20 text-sm mt-2">Em breve novos grupos estarão disponíveis.</p>
           </div>
         ) : (
-          <CarrosselGrupos grupos={grupos} />
+          <>
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex -ml-4">
+                {grupos.map((grupo, i) => (
+                  <div
+                    key={grupo.id}
+                    className="pl-4 min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_25%]"
+                  >
+                    <GrupoCard grupo={grupo} index={i} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Dots */}
+            <div className="flex justify-center gap-2 mt-10">
+              {grupos.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => emblaApi?.scrollTo(i)}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${
+                    current === i ? "w-10 bg-orange-500" : "w-2.5 bg-orange-500/20"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
         )}
 
         {/* Rodapé */}
         {!loading && (
-          <div data-animate style={{ opacity: 0, transform: "translateY(20px)", transition: "opacity 0.5s ease, transform 0.5s ease" }} className="text-center mt-12">
+          <div data-animate style={{ opacity: 0, transform: "translateY(20px)", transition: "opacity 0.5s ease, transform 0.5s ease" }} className="text-center mt-10">
             <p className="text-white/40 text-sm">
               Não encontrou um grupo perto de você?{" "}
               <a href="#contato" className="text-orange-400 hover:underline font-medium">Entre em contato</a>{" "}
