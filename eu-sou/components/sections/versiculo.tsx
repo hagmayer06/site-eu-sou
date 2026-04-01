@@ -14,7 +14,7 @@ const VERSICULO = {
 // ─── Configuração do carrossel ────────────────────────────────────────────────
 
 const VISIVEIS = 3;
-const INTERVALO = 1000;
+const INTERVALO = 5000;
 const BUCKET = "versiculo";
 
 // ─── Carrossel ────────────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ function Carrossel({ imagens }: { imagens: string[] }) {
               initial={{ opacity: 0, x: 60, scale: 0.85 }}
               animate={{ opacity: 1, x: 0, scale: isCentro ? 1 : 0.82 }}
               exit={{ opacity: 0, x: -60, scale: 0.85 }}
-              transition={{ duration: 1.4, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 2.0, ease: [0.32, 0.72, 0, 1] }}
               className={`relative overflow-hidden rounded-xl flex-shrink-0 ${
                 isCentro
                   ? "w-44 md:w-56 h-64 md:h-80 z-10 shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
