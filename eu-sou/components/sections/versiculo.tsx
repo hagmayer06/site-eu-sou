@@ -176,7 +176,7 @@ export default function Versiculo() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
-            className="flex-1 w-full flex justify-center md:justify-end"
+            className="flex-1 w-full hidden md:flex justify-center md:justify-end"
           >
             {loading ? <CarrosselSkeleton /> : <Carrossel imagens={imagens} />}
           </motion.div>

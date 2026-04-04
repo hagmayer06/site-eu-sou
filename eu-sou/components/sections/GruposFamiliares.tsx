@@ -95,10 +95,22 @@ function GrupoCard({ grupo, index }: { grupo: Grupo; index: number }) {
             </div>
           </div>
 
-          <div className="mt-5 flex items-center gap-2 text-orange-400 text-xs font-bold tracking-widest uppercase opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-            <span>PARTICIPAR</span>
-            <ArrowRight className="w-4 h-4" />
-          </div>
+          {grupo.telefone ? (
+            <a
+              href={`https://wa.me/55${grupo.telefone.replace(/\D/g, '')}?text=Olá,%20gostaria%20de%20participar%20do%20grupo%20familiar%20${encodeURIComponent(grupo.nome || grupo.bairro)}!`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 flex items-center gap-2 w-max text-orange-400 text-xs font-bold tracking-widest uppercase opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:text-orange-300"
+            >
+              <span>PARTICIPAR</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          ) : (
+            <div className="mt-5 flex items-center gap-2 text-orange-400 text-xs font-bold tracking-widest uppercase opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+              <span>PARTICIPAR</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          )}
         </div>
       </motion.div>
     );

@@ -1,27 +1,68 @@
-"use client";
+'use client'
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import useEmblaCarousel from 'embla-carousel-react'
+import { getDepartamentos, DepartamentoRow } from '@/lib/departamentoQueries'
+import { DepartamentoCard } from '@/components/ui/Deparatamentos'
 
-const stats = [
-  { number: "500+", label: "MEMBROS" },
-  { number: "12", label: "GRUPOS" },
-  { number: "5", label: "ANOS" },
-];
+function Loader2({ className }: { className?: string }) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  )
+}
 
 export default function ChamadoSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  const [departamentos, setDepartamentos] = useState<DepartamentoRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [erro, setErro] = useState(false)
+  const [current, setCurrent] = useState(0)
 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    loop: true,
+    slidesToScroll: 1,
+  })
+
+  // Intersection Observer para animações
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
-      },
+      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
       { threshold: 0.2 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  // Busca departamentos
+  useEffect(() => {
+    async function carregar() {
+      try {
+        const dados = await getDepartamentos()
+        setDepartamentos(dados)
+      } catch (err) {
+        console.error('Erro ao buscar departamentos:', err)
+        setErro(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+    carregar()
+  }, [])
+
+  // Sync dot indicator
+  useEffect(() => {
+    if (!emblaApi) return
+    setCurrent(emblaApi.selectedScrollSnap())
+    emblaApi.on('select', () => setCurrent(emblaApi.selectedScrollSnap()))
+  }, [emblaApi])
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
 
   return (
     <section
@@ -46,13 +87,12 @@ export default function ChamadoSection() {
         </svg>
       </div>
 
-      {/* ── Content ── */}
       <div className="relative z-10 max-w-6xl 2xl:max-w-7xl mx-auto">
 
-        {/* Label — centered with orange lines on each side */}
+        {/* ── Label ── */}
         <div
           className={`flex items-center gap-4 mb-10 2xl:mb-14 transition-all duration-700 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
           <div className="flex-1 h-[1px] bg-[#ff6b00] opacity-60" />
@@ -62,11 +102,12 @@ export default function ChamadoSection() {
           <div className="flex-1 h-[1px] bg-[#ff6b00] opacity-60" />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-10 lg:gap-14 2xl:gap-24 items-center">
-          {/* LEFT — photo */}
+        <div className="grid md:grid-cols-2 gap-10 lg:gap-14 2xl:gap-24 items-start">
+
+          {/* ── LEFT — foto + texto ── */}
           <div
-            className={`relative transition-all duration-700 delay-100 ${
-              visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+            className={`transition-all duration-700 delay-100 ${
+              visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
             }`}
           >
             <div className="w-full max-w-[112vw] mx-auto md:max-w-[620px] 2xl:max-w-[660px] rounded-sm overflow-hidden">
@@ -77,7 +118,6 @@ export default function ChamadoSection() {
               />
             </div>
 
-            {/* mt-1 no mobile, mt-3 no md+ */}
             <div className="mt-1 md:mt-3 max-w-[92vw] mx-auto md:max-w-[420px] 2xl:max-w-[520px]">
               <div className="w-16 2xl:w-20 h-[3px] bg-[#ff6b00]" />
               <div className="mt-1 md:mt-2">
@@ -91,15 +131,15 @@ export default function ChamadoSection() {
             </div>
           </div>
 
-          {/* RIGHT — text */}
+          {/* ── RIGHT — texto + carrossel ── */}
           <div
             className={`transition-all duration-700 delay-200 ${
-              visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+              visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
             }`}
           >
             <h2
               className="font-black leading-none tracking-tight text-white mb-6 uppercase"
-              style={{ fontSize: "clamp(2.4rem, 5.5vw, 6rem)" }}
+              style={{ fontSize: 'clamp(2.4rem, 5.5vw, 6rem)' }}
             >
               RESGATAR <br />
               <span className="text-[#ff6b00]">IDENTIDADES</span>
@@ -110,7 +150,7 @@ export default function ChamadoSection() {
             <div className="border-l-4 border-[#ff6b00] pl-4 mb-5">
               <p
                 className="text-gray-400 italic leading-relaxed"
-                style={{ fontSize: "clamp(0.8rem, 1.1vw, 1.1rem)" }}
+                style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1.1rem)' }}
               >
                 "Fomos chamados para resgatar identidades em Cristo e formar
                 discípulos que vivem e refletem Jesus."
@@ -118,39 +158,85 @@ export default function ChamadoSection() {
             </div>
 
             <p
-              className="text-gray-400 leading-relaxed mb-10"
-              style={{ fontSize: "clamp(0.8rem, 1.1vw, 1.1rem)" }}
+              className="text-gray-400 leading-relaxed mb-8"
+              style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1.1rem)' }}
             >
               Nossa missão é levar cada pessoa a um encontro genuíno com Deus,
               formando uma comunidade que vive o evangelho com autenticidade e
               transforma vidas pelo amor.
             </p>
 
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[#222]">
-              {stats.map((stat, i) => (
-                <div
-                  key={stat.label}
-                  className="transition-all duration-500"
-                  style={{ transitionDelay: `${300 + i * 100}ms` }}
-                >
-                  <p
-                    className="text-white font-black leading-none"
-                    style={{ fontSize: "clamp(1.8rem, 3.5vw, 4rem)" }}
+            {/* ── Carrossel de Departamentos ── */}
+            <div className="border-t border-[#222] pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[#ff6b00] tracking-[0.3em] text-[10px] font-black uppercase">
+                  Departamentos
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={scrollPrev}
+                    className="w-8 h-8 rounded-full border border-[#ff6b00]/40 flex items-center justify-center text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white hover:border-[#ff6b00] transition-all active:scale-90"
                   >
-                    {stat.number}
-                  </p>
-                  <p
-                    className="text-[#ff6b00] tracking-[0.2em] font-semibold mt-2 uppercase"
-                    style={{ fontSize: "clamp(0.6rem, 0.8vw, 0.85rem)" }}
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={scrollNext}
+                    className="w-8 h-8 rounded-full border border-[#ff6b00]/40 flex items-center justify-center text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white hover:border-[#ff6b00] transition-all active:scale-90"
                   >
-                    {stat.label}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {loading ? (
+                <div className="h-[200px] flex items-center justify-center border border-dashed border-zinc-800 rounded-xl">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#ff6b00]" />
+                </div>
+              ) : erro ? (
+                <div className="h-[200px] flex items-center justify-center bg-red-500/5 border border-red-500/20 rounded-xl">
+                  <p className="text-red-500 font-bold uppercase tracking-widest text-xs">
+                    Erro ao carregar departamentos
                   </p>
                 </div>
-              ))}
+              ) : departamentos.length === 0 ? (
+                <div className="h-[200px] flex items-center justify-center bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                  <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">
+                    Nenhum departamento cadastrado
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="overflow-hidden" ref={emblaRef}>
+                    <div className="flex -ml-4">
+                      {departamentos.map((dep, i) => (
+                        <div
+                          key={dep.id}
+                          className="pl-4 min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%]"
+                        >
+                          <DepartamentoCard departamento={dep} index={i} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dots */}
+                  <div className="flex gap-2 mt-4">
+                    {departamentos.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => emblaApi?.scrollTo(i)}
+                        className={`h-1 rounded-full transition-all duration-500 ${
+                          current === i ? 'w-8 bg-[#ff6b00]' : 'w-2 bg-zinc-800'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }
