@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-// ─── Tipagens ─────────────────────────────────────────────────────────────────
+// ─── Tipagenss ─────────────────────────────────────────────────────────────────
 
 export type DepartamentoRow = {
   id: string
