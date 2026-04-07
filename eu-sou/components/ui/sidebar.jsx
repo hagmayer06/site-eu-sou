@@ -2,14 +2,22 @@
 import { Home, PhoneCall, Calendar, Tv2, Users, ChevronLeft } from 'lucide-react'
 
 const menuItems = [
-  { label: 'Home', icon: <Home size={18} className="text-[#ff6b00]" /> },
-  { label: 'Chamado', icon: <PhoneCall size={18} className="text-[#ff6b00]" /> },
-  { label: 'Eventos', icon: <Calendar size={18} className="text-[#ff6b00]" /> },
-  { label: 'Série do mês', icon: <Tv2 size={18} className="text-[#ff6b00]" /> },
-  { label: 'Grupos Familiares', icon: <Users size={18} className="text-[#ff6b00]" /> },
+  { label: 'Home', icon: <Home size={18} className="text-[#ff6b00]" />, href: '#hero' },
+  { label: 'Chamado', icon: <PhoneCall size={18} className="text-[#ff6b00]" />, href: '#chamado' },
+  { label: 'Série do mês', icon: <Tv2 size={18} className="text-[#ff6b00]" />, href: '#serie' },
+  { label: 'Eventos', icon: <Calendar size={18} className="text-[#ff6b00]" />, href: '#eventos' },
+  { label: 'Grupos Familiares', icon: <Users size={18} className="text-[#ff6b00]" />, href: '#grupos' },
 ]
 
 export default function Sidebar({ Open, setOpen }) {
+  const handleNavigation = (href) => {
+    const element = document.querySelector(href)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+      setOpen(false)
+    }
+  }
+
   return (
     <>
       {/* Overlay */}
@@ -54,15 +62,15 @@ export default function Sidebar({ Open, setOpen }) {
         <nav className='flex flex-col gap-1 px-3'>
           {menuItems.map((item) => (
             
-             <a key={item.label}
-              href='#'
-              className='flex items-center gap-4 px-4 py-3 rounded-2xl text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200 group'
+             <button key={item.label}
+              onClick={() => handleNavigation(item.href)}
+              className='flex items-center gap-4 px-4 py-3 rounded-2xl text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200 group w-full text-left'
             >
               <span className='w-8 h-8 rounded-xl bg-white/5 group-hover:bg-white/10 flex items-center justify-center transition'>
                 {item.icon}
               </span>
               <span className='text-sm font-medium'>{item.label}</span>
-            </a>
+            </button>
           ))}
         </nav>
       </div>

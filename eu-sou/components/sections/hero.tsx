@@ -2,7 +2,7 @@
 
 export default function Hero() {
   return (
-    <section className="relative w-full h-[70vh] sm:h-[85vh] md:h-[90vh] flex items-center justify-center overflow-hidden">
+    <section id="hero" className="relative w-full h-[70vh] sm:h-[85vh] md:h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"

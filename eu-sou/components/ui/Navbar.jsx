@@ -4,7 +4,13 @@ import SocialButton from './SocialButton'
 import Sidebar from './sidebar'
 import { Instagram, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
-const menuItems = ['Home', 'Chamado', 'Eventos', 'Série', 'Céus']
+const menuItems = [
+  { label: 'Home', href: '#hero' },
+  { label: 'Chamado', href: '#chamado' },
+  { label: 'Eventos', href: '#eventos' },
+  { label: 'Série', href: '#serie' },
+  { label: 'Grupos', href: '#grupos' },
+]
 
 export default function Navbar() {
   const [Open, setOpen] = useState(false)
@@ -39,6 +45,13 @@ export default function Navbar() {
   const left   = menuItems[(activeIndex - 1 + len) % len]
   const center = menuItems[activeIndex]
   const right  = menuItems[(activeIndex + 1) % len]
+
+  const handleNavigation = (href) => {
+    const element = document.querySelector(href)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   return (
      <div className='fixed top-0 left-0 w-full flex justify-between items-center py-8 px-8 z-40 bg-transparent'>
@@ -77,17 +90,17 @@ export default function Navbar() {
           }}
           className='flex items-center gap-10'
         >
-          <span className='text-white/10 text-xl font-light tracking-widest cursor-pointer hover:text-white/70 transition-colors duration-200'>
-            {left}
-          </span>
+          <button onClick={() => handleNavigation(left.href)} className='text-white/10 text-xl font-light tracking-widest cursor-pointer hover:text-white/70 transition-colors duration-200'>
+            {left.label}
+          </button>
 
-          <span className='text-[#ff6b00] text-2xl font-semibold tracking-widest'>
-            {center}
-          </span>
+          <button onClick={() => handleNavigation(center.href)} className='text-[#ff6b00] text-2xl font-semibold tracking-widest cursor-pointer hover:text-[#ff8833] transition-colors duration-200'>
+            {center.label}
+          </button>
 
-          <span className='text-white/10 text-xl font-light tracking-widest cursor-pointer hover:text-white/70 transition-colors duration-200'>
-            {right}
-          </span>
+          <button onClick={() => handleNavigation(right.href)} className='text-white/10 text-xl font-light tracking-widest cursor-pointer hover:text-white/70 transition-colors duration-200'>
+            {right.label}
+          </button>
         </div>
 
         <button

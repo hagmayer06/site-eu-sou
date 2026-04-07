@@ -77,7 +77,7 @@ export default function SerieDoMes({ serie }: { serie: SerieDoMes }) {
   const semanas = [serie.semana_1, serie.semana_2, serie.semana_3, serie.semana_4].filter(Boolean)
 
   return (
-    <section className="relative w-full bg-[#ff6b00] px-4 md:px-10 py-14 flex flex-col items-center overflow-hidden">
+    <section id="serie" className="relative w-full bg-[#ff6b00] px-4 md:px-10 py-14 flex flex-col items-center overflow-hidden">
 
       {/* Rings decorativos */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-0">
