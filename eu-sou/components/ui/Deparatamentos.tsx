@@ -113,15 +113,33 @@ export function DepartamentoCard({
         className="group relative h-[180px] p-6 bg-black rounded-2xl cursor-pointer border border-zinc-800 hover:border-[#ff6b00] hover:bg-[#ff6b00]/5 transition-all duration-400 flex flex-col justify-end overflow-hidden"
       >
         {/* Ícone decorativo de fundo */}
-        <Building2 className="absolute top-4 right-4 w-12 h-12 text-zinc-900 group-hover:text-[#ff6b00]/20 transition-colors duration-500" />
+        <Building2 className="absolute top-4 right-4 w-12 h-12 text-[#ff6b00] group-hover:text-[#ff6b00]/60 transition-colors duration-500" />
 
         <div className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">
           <p className="inline-flex items-center self-start px-2 py-1 rounded bg-[#ff6b00]/10 text-[#ff6b00] text-[10px] font-black tracking-widest uppercase mb-3">
             DEPARTAMENTO
           </p>
-          <h3 className="text-white font-black uppercase tracking-tight text-xl leading-tight group-hover:text-[#ff6b00] transition-colors duration-300 line-clamp-2">
+          <h3 className="text-white font-black uppercase tracking-tight text-xl leading-tight group-hover:text-[#ff6b00] transition-colors duration-300 line-clamp-2 mb-3">
             {departamento.nome}
           </h3>
+          
+          {lideres.length > 0 && (
+            <div className="pt-3 border-t border-zinc-700">
+              <p className="text-zinc-400 text-[9px] font-black tracking-widest uppercase mb-2">
+                Líderes
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {lideres.map((lider, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-0.5 rounded bg-[#ff6b00]/20 text-[#ff6b00] text-[10px] font-semibold line-clamp-1"
+                  >
+                    {lider}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
 

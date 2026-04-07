@@ -127,6 +127,9 @@ export default function ChamadoSection() {
                 <p className="text-white text-sm 2xl:text-base font-bold uppercase tracking-widest mt-0.5 md:mt-1">
                   IGREJA EU SOU
                 </p>
+                <p className="text-[#ff6b00] text-xs 2xl:text-sm font-bold tracking-widest mt-2">
+                  Gabriel • Thaíse
+                </p>
               </div>
             </div>
           </div>
@@ -169,9 +172,14 @@ export default function ChamadoSection() {
             {/* ── Carrossel de Departamentos ── */}
             <div className="border-t border-[#222] pt-6">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[#ff6b00] tracking-[0.3em] text-[10px] font-black uppercase">
-                  Departamentos
-                </p>
+                <div>
+                  <p className="text-[#ff6b00] tracking-[0.3em] text-[10px] font-black uppercase">
+                    Departamentos
+                  </p>
+                  <p className="text-zinc-500 text-[9px] tracking-widest uppercase mt-1">
+                    Clique para saber mais
+                  </p>
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={scrollPrev}
