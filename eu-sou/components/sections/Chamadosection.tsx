@@ -144,7 +144,7 @@ export default function ChamadoSection() {
               className="font-black leading-none tracking-tight text-white mb-6 uppercase"
               style={{ fontSize: 'clamp(2.4rem, 5.5vw, 6rem)' }}
             >
-              RESGATAR <br />
+              RESGATANDO <br />
               <span className="text-[#ff6b00]">IDENTIDADES</span>
               <br />
               <span className="text-[#4a4a4a]">EM CRISTO</span>

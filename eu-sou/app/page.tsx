@@ -5,8 +5,8 @@ import SerieDoMes from "@/components/sections/SerieDoMes"
 import { getSerieDoMes } from "@/lib/queries"
 import Eventos from "@/components/sections/Eventos"
 import GruposFamiliares from "@/components/sections/GruposFamiliares"
-import Versiculo from "@/components/sections/versiculo"
 import Footer from "@/components/sections/Footer"
+import Localizacao from "@/components/sections/localização"
 export default async function Home() {
   const serie = await getSerieDoMes()
 
@@ -14,9 +14,9 @@ export default async function Home() {
     <main>
       <Hero />
       <ChamadoSection />
-      {serie && <SerieDoMes serie={serie} />}
+      <Localizacao />
       <Eventos />
-      <Versiculo />
+       {serie && <SerieDoMes serie={serie} />}
       <GruposFamiliares />
       <Footer />
 
