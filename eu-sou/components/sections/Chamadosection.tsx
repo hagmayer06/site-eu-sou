@@ -117,21 +117,6 @@ export default function ChamadoSection() {
                 className="w-full h-auto object-contain"
               />
             </div>
-
-            <div className="mt-1 md:mt-3 max-w-[92vw] mx-auto md:max-w-[420px] 2xl:max-w-[520px]">
-              <div className="w-16 2xl:w-20 h-[3px] bg-[#ff6b00]" />
-              <div className="mt-1 md:mt-2">
-                <p className="text-[#ff6b00] tracking-[0.25em] text-[10px] 2xl:text-xs font-semibold uppercase">
-                  PASTORES
-                </p>
-                <p className="text-white text-sm 2xl:text-base font-bold uppercase tracking-widest mt-0.5 md:mt-1">
-                  IGREJA EU SOU
-                </p>
-                <p className="text-[#ff6b00] text-xs 2xl:text-sm font-bold tracking-widest mt-2">
-                  Gabriel • Thaíse
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* ── RIGHT — texto + carrossel ── */}
@@ -156,7 +141,7 @@ export default function ChamadoSection() {
                 style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1.1rem)' }}
               >
                 "Fomos chamados para resgatar identidades em Cristo e formar
-                discípulos que vivem e refletem Jesus."
+                discípulos dEle"
               </p>
             </div>
 
@@ -164,9 +149,8 @@ export default function ChamadoSection() {
               className="text-gray-400 leading-relaxed mb-8"
               style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1.1rem)' }}
             >
-              Nossa missão é levar cada pessoa a um encontro genuíno com Deus,
-              formando uma comunidade que vive o evangelho com autenticidade e
-              transforma vidas pelo amor.
+              Nossa missão é despertar em cada pessoa a memória de quem ela realmente é um filho amado pelo Pai e, a partir dessa identidade restaurada, 
+              formar discípulos que vivem, amam e multiplicam o evangelho como filhos que conhecem o seu coração.
             </p>
 
             {/* ── Carrossel de Departamentos ── */}
@@ -174,7 +158,7 @@ export default function ChamadoSection() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-[#ff6b00] tracking-[0.3em] text-[10px] font-black uppercase">
-                    Departamentos
+                    Conheça nossa equipe:
                   </p>
                   <p className="text-zinc-500 text-[9px] tracking-widest uppercase mt-1">
                     Clique para saber mais

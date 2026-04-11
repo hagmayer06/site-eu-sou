@@ -23,8 +23,8 @@ const Footer = () => {
               </span>
             </div>
             <p className="mb-7 text-sm leading-relaxed text-gray-400">
-              Um lugar de fé, amor e transformação. Venha fazer parte da nossa
-              família e crescer junto em comunidade.
+              Fomos chamados para resgatar identidades em Cristo e formar
+                discípulos dEle
             </p>
             {/* Social icons */}
             <div className="flex gap-3">
@@ -37,25 +37,6 @@ const Footer = () => {
                       <rect x="2" y="2" width="20" height="20" rx="5" />
                       <circle cx="12" cy="12" r="4.5" />
                       <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: "Facebook",
-                  href: "#",
-                  svg: (
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: "YouTube",
-                  href: "#",
-                  svg: (
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-                      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#111111" />
                     </svg>
                   ),
                 },
@@ -116,7 +97,6 @@ const Footer = () => {
             <ul className="space-y-5">
               {[
                 { day: "Domingo", time: "09h00 e 19h00", desc: "Culto de Celebração" },
-                { day: "Quarta-feira", time: "19h30", desc: "Culto de Oração" },
               ].map(({ day, time, desc }) => (
                 <li key={day} className="flex flex-col gap-1">
                   <span className="text-sm font-semibold text-white">{day}</span>
@@ -141,7 +121,7 @@ const Footer = () => {
                       <circle cx="12" cy="10" r="3" />
                     </svg>
                   ),
-                  text: "Rua das Flores, 123\nSão José, SC — 88100-000",
+                  text: "Rua Luiz Pedro de Oliveira, 2020 – Humaitá de Cima",
                 },
                 {
                   icon: (
@@ -149,7 +129,7 @@ const Footer = () => {
                       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                     </svg>
                   ),
-                  text: "(48) 9 9999-0000",
+                  text: "(48) 9857-2297 - (48) 9637-3347",
                 },
                 {
                   icon: (
@@ -158,7 +138,7 @@ const Footer = () => {
                       <polyline points="22,6 12,13 2,6" />
                     </svg>
                   ),
-                  text: "contato@igrejav.com.br",
+                  text: "comuinidadecristaeusou3@gmail.com",
                 },
               ].map(({ icon, text }, i) => (
                 <li key={i} className="flex items-start gap-3">

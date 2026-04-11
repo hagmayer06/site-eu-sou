@@ -14,8 +14,7 @@ export const localizacaoLocales = {
       completo: "Rua Osni João Vieira, São José - SC",
     },
     cultos: [
-      { dia: "Domingo", horario: "19h30" },
-      { dia: "Quarta-feira", horario: "19h30" },
+      { dia: "Domingo", horario: "19:00" },
     ],
     accessibility: {
       mapTitle: "Localização da Igreja Eu Sou",
@@ -35,8 +34,7 @@ export const localizacaoLocales = {
       completo: "Rua Osni João Vieira, São José - SC",
     },
     cultos: [
-      { dia: "Sunday", horario: "19h30" },
-      { dia: "Wednesday", horario: "19h30" },
+      { dia: "Sunday", horario: "19:00" },
     ],
     accessibility: {
       mapTitle: "Location of Eu Sou Church",
@@ -56,8 +54,7 @@ export const localizacaoLocales = {
       completo: "Rua Osni João Vieira, São José - SC",
     },
     cultos: [
-      { dia: "Domingo", horario: "19h30" },
-      { dia: "Miércoles", horario: "19h30" },
+      { dia: "Domingo", horario: "19:00" },
     ],
     accessibility: {
       mapTitle: "Ubicación de la Iglesia Eu Sou",
