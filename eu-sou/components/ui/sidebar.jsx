@@ -1,5 +1,5 @@
 'use client'
-import { Home, PhoneCall, Calendar, Tv2, Users, ChevronLeft } from 'lucide-react'
+import { Home, PhoneCall, Calendar, Tv2, Users, ChevronLeft, MapPin } from 'lucide-react'
 
 const menuItems = [
   { label: 'Home', icon: <Home size={18} className="text-[#ff6b00]" />, href: '#hero' },
@@ -7,6 +7,7 @@ const menuItems = [
   { label: 'Série do mês', icon: <Tv2 size={18} className="text-[#ff6b00]" />, href: '#serie' },
   { label: 'Eventos', icon: <Calendar size={18} className="text-[#ff6b00]" />, href: '#eventos' },
   { label: 'Grupos Familiares', icon: <Users size={18} className="text-[#ff6b00]" />, href: '#grupos' },
+  { label: 'Localização', icon: <MapPin size={18} className="text-[#ff6b00]" />, href: '#localizacao' },
 ]
 
 export default function Sidebar({ Open, setOpen }) {

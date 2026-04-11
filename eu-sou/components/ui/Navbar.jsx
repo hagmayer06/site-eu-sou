@@ -10,6 +10,7 @@ const menuItems = [
   { label: 'Eventos', href: '#eventos' },
   { label: 'Série', href: '#serie' },
   { label: 'Grupos', href: '#grupos' },
+   { label: 'Localização', href: '#localizacao' },
 ]
 
 export default function Navbar() {

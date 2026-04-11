@@ -88,12 +88,12 @@ const Footer = () => {
             </h3>
             <ul className="space-y-3">
               {[
-                { label: "Início", href: "/" },
-                { label: "Sobre Nós", href: "/sobre" },
-                { label: "Ministérios", href: "/ministerios" },
-                { label: "Agenda", href: "/agenda" },
-                { label: "Sermões", href: "/sermoes" },
-                { label: "Blog", href: "/blog" },
+                { label: "Home", href: "#hero" },
+                { label: "Chamado", href: "#chamado" },
+                { label: "Agenda", href: "#serie" },
+                { label: "Tema", href: "#eventos" },
+                { label: "Grupos", href: "#grupos" },
+                { label: "Localização", href: "#localizacao" },
               ].map(({ label, href }) => (
                 <li key={label}>
                   <Link
