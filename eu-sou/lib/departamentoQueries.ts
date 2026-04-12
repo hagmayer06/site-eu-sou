@@ -7,6 +7,7 @@ export type DepartamentoRow = {
   nome: string
   descricao: string | null
   lideres: string | null       // "João Silva, Maria Souza"
+  imagem_url: string | null  
   ativo: boolean
   criado_em: string
 }

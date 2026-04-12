@@ -6,9 +6,22 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { getDepartamentos, DepartamentoRow } from '@/lib/departamentoQueries'
 import { DepartamentoCard } from '@/components/ui/Deparatamentos'
 
+const IMAGEM_PADRAO = '/img/pastores.png'
+
 function Loader2({ className }: { className?: string }) {
   return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
   )
@@ -22,28 +35,56 @@ export default function ChamadoSection() {
   const [erro, setErro] = useState(false)
   const [current, setCurrent] = useState(0)
 
+  // ── Imagem dinâmica ──────────────────────────────────────────────────────
+  const [imagemAtiva, setImagemAtiva] = useState<string>('')
+  const [imagemFadindo, setImagemFadindo] = useState(false)
+  const [departamentoAtivo, setDepartamentoAtivo] = useState<DepartamentoRow | null>(null)
+
+  const trocarImagem = useCallback((novaUrl: string | null, departamento?: DepartamentoRow) => {
+    if (!novaUrl && !departamento) return
+
+    setImagemFadindo(true)
+    setTimeout(() => {
+      if (novaUrl) {
+        setImagemAtiva(novaUrl)
+      }
+      if (departamento) {
+        setDepartamentoAtivo(departamento)
+      }
+      setImagemFadindo(false)
+    }, 300)
+  }, [])
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     loop: true,
     slidesToScroll: 1,
   })
 
-  // Intersection Observer para animações
+  // Intersection Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true)
+      },
       { threshold: 0.2 }
     )
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [])
 
-  // Busca departamentos
+  // Busca departamentos e carrega o primeiro automaticamente
   useEffect(() => {
     async function carregar() {
       try {
         const dados = await getDepartamentos()
         setDepartamentos(dados)
+        // Define o primeiro departamento como ativo automaticamente
+        if (dados.length > 0) {
+          const primeiro = dados[0]
+          setDepartamentoAtivo(primeiro)
+          setImagemAtiva(primeiro.imagem_url || '')
+        }
       } catch (err) {
         console.error('Erro ao buscar departamentos:', err)
         setErro(true)
@@ -70,7 +111,7 @@ export default function ChamadoSection() {
       ref={sectionRef}
       className="relative bg-black py-20 md:py-28 2xl:py-44 px-6 overflow-hidden"
     >
-      {/* ── Background: circular orange rings ── */}
+      {/* ── Background rings ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <svg
           className="absolute w-full h-full opacity-[0.07]"
@@ -104,20 +145,41 @@ export default function ChamadoSection() {
 
         <div className="grid md:grid-cols-2 gap-10 lg:gap-14 2xl:gap-24 items-start">
 
-          {/* ── LEFT — foto + texto ── */}
+          {/* ── LEFT — imagem dinâmica ── */}
           <div
             className={`transition-all duration-700 delay-100 ${
               visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
             }`}
           >
-            <div className="w-full max-w-[112vw] mx-auto md:max-w-[620px] 2xl:max-w-[660px] rounded-sm overflow-hidden">
+            {/* Nome do departamento */}
+            <div className="mb-2">
+              <p className="text-[#ff6b00] text-xs font-black uppercase tracking-widest">
+                Departamento
+              </p>
+              <h3 className="text-white font-black text-2xl uppercase tracking-tight mb-1">
+                {departamentoAtivo ? departamentoAtivo.nome : 'Carregando...'}
+              </h3>
+              {departamentoAtivo && departamentoAtivo.lideres && (
+                <p className="text-[#ff6b00] text-lg font-semibold">
+                  {departamentoAtivo.lideres}
+                </p>
+              )}
+            </div>
+
+            {/* Imagem */}
+            {imagemAtiva && (
+            <div className="-mt-2">
               <img
-                src="/img/pastores.png"
-                alt="Pastores"
-                className="w-full h-auto object-contain"
+                key={imagemAtiva}
+                src={imagemAtiva}
+                alt={departamentoAtivo ? departamentoAtivo.nome : 'Departamento'}
+                className={`w-full h-auto object-contain transition-opacity duration-300 ${
+                  imagemFadindo ? 'opacity-0' : 'opacity-100'
+                }`}
               />
             </div>
-          </div>
+            )}
+            </div>
 
           {/* ── RIGHT — texto + carrossel ── */}
           <div
@@ -140,8 +202,7 @@ export default function ChamadoSection() {
                 className="text-gray-400 italic leading-relaxed"
                 style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1.1rem)' }}
               >
-                "Fomos chamados para resgatar identidades em Cristo e formar
-                discípulos dEle"
+                "Fomos chamados para resgatar identidades em Cristo e formar discípulos dEle"
               </p>
             </div>
 
@@ -149,8 +210,9 @@ export default function ChamadoSection() {
               className="text-gray-400 leading-relaxed mb-8"
               style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1.1rem)' }}
             >
-              Nossa missão é despertar em cada pessoa a memória de quem ela realmente é um filho amado pelo Pai e, a partir dessa identidade restaurada, 
-              formar discípulos que vivem, amam e multiplicam o evangelho como filhos que conhecem o seu coração.
+              Nossa missão é despertar em cada pessoa a memória de quem ela realmente é — um filho amado pelo
+              Pai e, a partir dessa identidade restaurada, formar discípulos que vivem, amam e multiplicam o
+              evangelho como filhos que conhecem o seu coração.
             </p>
 
             {/* ── Carrossel de Departamentos ── */}
@@ -205,7 +267,11 @@ export default function ChamadoSection() {
                           key={dep.id}
                           className="pl-4 min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%]"
                         >
-                          <DepartamentoCard departamento={dep} index={i} />
+                          <DepartamentoCard
+                            departamento={dep}
+                            index={i}
+                            onSelect={(url) => trocarImagem(url, dep)}
+                          />
                         </div>
                       ))}
                     </div>
