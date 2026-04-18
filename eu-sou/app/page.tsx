@@ -4,9 +4,10 @@ import ChamadoSection from "@/components/sections/Chamadosection"
 import SerieDoMes from "@/components/sections/SerieDoMes"
 import { getSerieDoMes } from "@/lib/queries"
 import Eventos from "@/components/sections/Eventos"
-import GruposFamiliares from "@/components/sections/GruposFamiliares"
+import CafeComPastor from "@/components/sections/CafeComPastor"
 import Footer from "@/components/sections/Footer"
 import Localizacao from "@/components/sections/localização"
+import Contribuicao from "@/components/sections/Contribuição"
 export default async function Home() {
   const serie = await getSerieDoMes()
 
@@ -17,7 +18,8 @@ export default async function Home() {
       <Localizacao />
       <Eventos />
        {serie && <SerieDoMes serie={serie} />}
-      <GruposFamiliares />
+      <CafeComPastor />
+      <Contribuicao />
       <Footer />
 
     </main>
