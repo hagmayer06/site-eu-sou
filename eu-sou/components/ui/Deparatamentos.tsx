@@ -26,7 +26,8 @@ export function DepartamentoCard({ departamento, index, onSelect }: Departamento
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
       onClick={handleClick}
-      className="group relative h-[180px] p-6 bg-black rounded-2xl cursor-pointer border border-zinc-800 hover:border-[#ff6b00] hover:bg-[#ff6b00]/5 transition-all duration-400 flex flex-col justify-end overflow-hidden"
+      // min-w-0 e break-words são essenciais para evitar vazar dentro do flex
+      className="group relative h-[180px] w-full min-w-0 p-5 md:p-6 bg-black rounded-2xl cursor-pointer border border-zinc-800 hover:border-[#ff6b00] hover:bg-[#ff6b00]/5 transition-all duration-400 flex flex-col justify-end overflow-hidden"
     >
       {/* Miniatura da imagem no canto (se existir) */}
       {departamento.imagem_url && (
@@ -41,27 +42,30 @@ export function DepartamentoCard({ departamento, index, onSelect }: Departamento
 
       {/* Ícone decorativo */}
       {!departamento.imagem_url && (
-        <Building2 className="absolute top-4 right-4 w-12 h-12 text-[#ff6b00] group-hover:text-[#ff6b00]/60 transition-colors duration-500" />
+        <Building2 className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 text-[#ff6b00] group-hover:text-[#ff6b00]/60 transition-colors duration-500" />
       )}
 
-      <div className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">
-        <p className="inline-flex items-center self-start px-2 py-1 rounded bg-[#ff6b00]/10 text-[#ff6b00] text-[10px] font-black tracking-widest uppercase mb-3">
+      <div className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 min-w-0">
+        <p className="inline-flex items-center self-start px-2 py-1 rounded bg-[#ff6b00]/10 text-[#ff6b00] text-[9px] md:text-[10px] font-black tracking-widest uppercase mb-2 md:mb-3">
           DEPARTAMENTO
         </p>
-        <h3 className="text-white font-black uppercase tracking-tight text-xl leading-tight group-hover:text-[#ff6b00] transition-colors duration-300 line-clamp-2 mb-3">
+        
+        {/* break-words evita que nomes gigantes quebrem o card */}
+        <h3 className="text-white font-black uppercase tracking-tight text-lg md:text-xl leading-tight group-hover:text-[#ff6b00] transition-colors duration-300 line-clamp-2 mb-2 md:mb-3 break-words">
           {departamento.nome}
         </h3>
 
         {lideres.length > 0 && (
-          <div className="pt-3 border-t border-zinc-700">
-            <p className="text-zinc-400 text-[9px] font-black tracking-widest uppercase mb-2">
+          <div className="pt-2 md:pt-3 border-t border-zinc-700 min-w-0">
+            <p className="text-zinc-400 text-[8px] md:text-[9px] font-black tracking-widest uppercase mb-1 md:mb-2">
               Líderes
             </p>
             <div className="flex flex-wrap gap-1">
               {lideres.map((lider, i) => (
                 <span
                   key={i}
-                  className="px-2 py-0.5 rounded bg-[#ff6b00]/20 text-[#ff6b00] text-[10px] font-semibold line-clamp-1"
+                  // max-w-full e truncate garantem que nomes longos se ajustem com '...' se necessário
+                  className="max-w-full truncate px-2 py-0.5 rounded bg-[#ff6b00]/20 text-[#ff6b00] text-[9px] md:text-[10px] font-semibold"
                 >
                   {lider}
                 </span>

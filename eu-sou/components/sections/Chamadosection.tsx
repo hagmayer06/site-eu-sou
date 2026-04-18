@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { getDepartamentos, DepartamentoRow } from '@/lib/departamentoQueries'
-import { DepartamentoCard } from '@/components/ui/Deparatamentos'
+import { DepartamentoCard } from '../ui/Deparatamentos'
 
 const IMAGEM_PADRAO = '/img/pastores.png'
 
@@ -79,7 +79,6 @@ export default function ChamadoSection() {
       try {
         const dados = await getDepartamentos()
         setDepartamentos(dados)
-        // Define o primeiro departamento como ativo automaticamente
         if (dados.length > 0) {
           const primeiro = dados[0]
           setDepartamentoAtivo(primeiro)
@@ -109,7 +108,7 @@ export default function ChamadoSection() {
     <section
       id="chamado"
       ref={sectionRef}
-      className="relative bg-black py-20 md:py-28 2xl:py-44 px-6 overflow-hidden"
+      className="relative bg-black py-20 md:py-28 2xl:py-44 px-6 overflow-hidden w-full"
     >
       {/* ── Background rings ── */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -128,68 +127,67 @@ export default function ChamadoSection() {
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-6xl 2xl:max-w-7xl mx-auto">
+      <div className="relative z-10 max-w-6xl 2xl:max-w-7xl mx-auto w-full">
 
         {/* ── Label ── */}
         <div
-          className={`flex items-center gap-4 mb-10 2xl:mb-14 transition-all duration-700 ${
+          className={`flex items-center gap-2 md:gap-4 mb-10 2xl:mb-14 transition-all duration-700 ${
             visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
           <div className="flex-1 h-[1px] bg-[#ff6b00] opacity-60" />
-          <p className="text-[#ff6b00] tracking-[0.35em] text-xs 2xl:text-sm font-semibold uppercase whitespace-nowrap">
+          <p className="text-[#ff6b00] tracking-[0.2em] md:tracking-[0.35em] text-[10px] md:text-xs 2xl:text-sm font-semibold uppercase text-center md:whitespace-nowrap">
             NOSSO CHAMADO
           </p>
           <div className="flex-1 h-[1px] bg-[#ff6b00] opacity-60" />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-10 lg:gap-14 2xl:gap-24 items-start">
+        <div className="grid md:grid-cols-2 gap-10 lg:gap-14 2xl:gap-24 items-start w-full">
 
           {/* ── LEFT — imagem dinâmica ── */}
           <div
-            className={`transition-all duration-700 delay-100 ${
+            className={`transition-all duration-700 delay-100 min-w-0 ${
               visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
             }`}
           >
-            {/* Nome do departamento */}
-            <div className="mb-2">
-              <p className="text-[#ff6b00] text-xs font-black uppercase tracking-widest">
+            <div className="mb-4 md:mb-2">
+              <p className="text-[#ff6b00] text-[10px] md:text-xs font-black uppercase tracking-widest">
                 Departamento
               </p>
-              <h3 className="text-white font-black text-2xl uppercase tracking-tight mb-1">
+              <h3 className="text-white font-black text-xl md:text-2xl uppercase tracking-tight mb-1 break-words">
                 {departamentoAtivo ? departamentoAtivo.nome : 'Carregando...'}
               </h3>
               {departamentoAtivo && departamentoAtivo.lideres && (
-                <p className="text-[#ff6b00] text-lg font-semibold">
+                <p className="text-[#ff6b00] text-base md:text-lg font-semibold break-words">
                   {departamentoAtivo.lideres}
                 </p>
               )}
             </div>
 
-            {/* Imagem */}
             {imagemAtiva && (
-            <div className="-mt-2">
-              <img
-                key={imagemAtiva}
-                src={imagemAtiva}
-                alt={departamentoAtivo ? departamentoAtivo.nome : 'Departamento'}
-                className={`w-full h-auto object-contain transition-opacity duration-300 ${
-                  imagemFadindo ? 'opacity-0' : 'opacity-100'
-                }`}
-              />
-            </div>
+              <div className="-mt-2 w-full">
+                <img
+                  key={imagemAtiva}
+                  src={imagemAtiva}
+                  alt={departamentoAtivo ? departamentoAtivo.nome : 'Departamento'}
+                  className={`w-full max-w-full h-auto object-contain transition-opacity duration-300 ${
+                    imagemFadindo ? 'opacity-0' : 'opacity-100'
+                  }`}
+                />
+              </div>
             )}
-            </div>
+          </div>
 
           {/* ── RIGHT — texto + carrossel ── */}
           <div
-            className={`transition-all duration-700 delay-200 ${
+            className={`transition-all duration-700 delay-200 min-w-0 ${
               visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
             }`}
           >
+            {/* VOLTADO PARA O TAMANHO ORIGINAL AQUI EMBAIXO */}
             <h2
-              className="font-black leading-none tracking-tight text-white mb-6 uppercase"
-              style={{ fontSize: 'clamp(2.4rem, 5.5vw, 6rem)' }}
+              className="font-black leading-none tracking-tight text-white mb-6 uppercase break-words"
+              style={{ fontSize: 'clamp(2.4rem, 5.5vw, 6rem)' }} 
             >
               RESGATANDO <br />
               <span className="text-[#ff6b00]">IDENTIDADES</span>
@@ -215,18 +213,17 @@ export default function ChamadoSection() {
               evangelho como filhos que conhecem o seu coração.
             </p>
 
-            {/* ── Carrossel de Departamentos ── */}
-            <div className="border-t border-[#222] pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-[#ff6b00] tracking-[0.3em] text-[10px] font-black uppercase">
+            <div className="border-t border-[#222] pt-6 min-w-0">
+              <div className="flex flex-wrap items-start sm:items-center justify-between mb-4 gap-4">
+                <div className="min-w-0">
+                  <p className="text-[#ff6b00] tracking-[0.15em] sm:tracking-[0.3em] text-[10px] font-black uppercase truncate">
                     Conheça nossa equipe:
                   </p>
-                  <p className="text-zinc-500 text-[9px] tracking-widest uppercase mt-1">
+                  <p className="text-zinc-500 text-[9px] tracking-widest uppercase mt-1 truncate">
                     Clique para saber mais
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <button
                     onClick={scrollPrev}
                     className="w-8 h-8 rounded-full border border-[#ff6b00]/40 flex items-center justify-center text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white hover:border-[#ff6b00] transition-all active:scale-90"
@@ -248,26 +245,26 @@ export default function ChamadoSection() {
                 </div>
               ) : erro ? (
                 <div className="h-[200px] flex items-center justify-center bg-red-500/5 border border-red-500/20 rounded-xl">
-                  <p className="text-red-500 font-bold uppercase tracking-widest text-xs">
+                  <p className="text-red-500 font-bold uppercase tracking-widest text-xs text-center">
                     Erro ao carregar departamentos
                   </p>
                 </div>
               ) : departamentos.length === 0 ? (
                 <div className="h-[200px] flex items-center justify-center bg-zinc-900/50 border border-zinc-800 rounded-xl">
-                  <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">
+                  <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs text-center">
                     Nenhum departamento cadastrado
                   </p>
                 </div>
               ) : (
                 <>
-                  <div className="overflow-hidden" ref={emblaRef}>
+                  <div className="overflow-hidden w-full" ref={emblaRef}>
                     <div className="flex -ml-4">
                       {departamentos.map((dep, i) => (
                         <div
                           key={dep.id}
-                          className="pl-4 min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%]"
+                          className="pl-4 min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_100%] lg:flex-[0_0_50%]"
                         >
-                          <DepartamentoCard
+                          <DepartamentoCard // Corrigido aqui também
                             departamento={dep}
                             index={i}
                             onSelect={(url) => trocarImagem(url, dep)}
@@ -277,8 +274,7 @@ export default function ChamadoSection() {
                     </div>
                   </div>
 
-                  {/* Dots */}
-                  <div className="flex gap-2 mt-4">
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {departamentos.map((_, i) => (
                       <button
                         key={i}
