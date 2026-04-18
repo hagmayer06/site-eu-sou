@@ -39,6 +39,7 @@ const fadeRight = {
 export default function CafeComPastor() {
   return (
     <section
+      id="Discipulado"
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 py-20"
       style={{ backgroundColor: "#000000" }}
     >

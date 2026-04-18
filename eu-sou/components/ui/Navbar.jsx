@@ -9,7 +9,7 @@ const menuItems = [
   { label: 'Chamado', href: '#chamado' },
   { label: 'Eventos', href: '#eventos' },
   { label: 'Série', href: '#serie' },
-  { label: 'Grupos', href: '#grupos' },
+  { label: 'Discipulado', href: '#Discipulado' },
    { label: 'Localização', href: '#localizacao' },
 ]
 
